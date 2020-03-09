@@ -132,13 +132,13 @@ class Game(object):
         if piece == 0:
             return
         elif piece.player != self.active_player:
-            print("it's not your turn")
+            print("it's not your turn", piece.player, self.active_player)
             return
         elif self.board[i][j] != 0:
             if piece.player == self.board[i][j].player:
                 print("can't capture your own pieces")
                 return
-        elif i==self.selected[0] and piece.direction == 0:
+        if i==self.selected[0] and piece.direction == 0:
             if piece.master == False:
                 if (i + j - sum(self.selected))%2 == 0:
                     print("must choose a different color")

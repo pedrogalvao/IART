@@ -6,16 +6,30 @@ Created on Mon Mar  9 10:42:50 2020
 """
 #import pivit
 from queue import PriorityQueue
+import copy
 
 class Bot(object):
     def __init__(self):
         self.alpha = -1e+10
         self.beta = 1e+10
-        self.queue = PriorityQueue() #usar priority queue
+        self.queue = PriorityQueue()
         self.player_number = 1
+        self.active_player = 0
         
     def choose_move(self, state):
         pass
+    
+    def move(self, board, x1, y1, x2, y2):
+        board = copy.deepcopy(board)
+        print(x1,y1,x2,y2)
+        piece = board[x1][y1]
+        board[x2][y2] = piece
+        board[x1][y1] = 0
+        board[x2][y2].direction = not board[x2][y2].direction
+        if (x2==0 or x2==7) and (y2==0 or y2==7):
+            board[x2][y2].master = True
+        self.active_player = (self.active_player+1)%2
+        return board
     
     def open_node(self):
         node_to_open = self.queue.get()
@@ -23,15 +37,34 @@ class Bot(object):
         for x in range(len(board)):
             for y in range(len(board[x])):
                 p = board[x][y]
+                print(p)
                 if p != 0 and p.player == self.player_number:
+                    print("    ok")
                     if p.direction == 0:
+                        print("0")
+                        for i in range(1,8):
+                            if y+i >= len(board[x]):
+                                print("OOOOO")
+                                break
+                            elif board[x][y+i] == 0:
+                                print(self.move(board,x,y,x+i,y))
+                                self.queue.put(self.move(board,x,y,x,y+i))
+                            elif board[x][y+i].player != self.player_number:
+                                print(self.move(board, x,y,x,y+i))
+                                self.queue.put(self.move(board,x,y,x,y+i))
+                            else:
+                                break
+                    else:
                         for i in range(1,8):
                             if x+i >= len(board):
+                                print("OOOOO")
                                 break
                             elif board[x+i][y] == 0:
-                                return (x+i,y)
+                                print(self.move(board,x,y,x+i,y))
+                                self.queue.put(self.move(board,x,y,x+i,y))
                             elif board[x+i][y].player != self.player_number:
-                                self.queue.put((x+i,y))
+                                print(self.move(board,x,y,x+i,y))
+                                self.queue.put(self.move(board,x,y,x+i,y))
                             else:
                                 break
             
@@ -46,3 +79,14 @@ class Bot(object):
                     else:
                         value -= 1+piece.master
         return value
+    
+    
+    
+
+
+b = Bot()
+b.queue.put((1, [[pivit.Piece(1,0,0), 0, pivit.Piece(0,0,0)]]))
+b.open_node()
+
+
+
