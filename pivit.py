@@ -16,6 +16,13 @@ class Piece(object):
         self.direction = direction
         self.master = master
         
+    def __repr__(self):
+        if self.master:
+            m = " M"
+        else:
+            m=""
+        return "P"+str(self.player)+" "+str(self.direction)+m
+        
         
 
 
@@ -24,7 +31,6 @@ class Game(object):
     def __init__(self):
         self.currentLevel = 0
         pygame.init()
-        #self.levels = [Level6(game=self)]
         window_width = 840
         window_height = 840
         win = pygame.display.set_mode((window_width, window_height))
@@ -40,6 +46,7 @@ class Game(object):
         pygame.quit()
         
     def play(self):
+        """funcao que inicia o jogo"""
         for i in range(len(self.board)):
             for j in range(len(self.board[i])):
                 self.buttons[i][j] = pygame.draw.rect(self.window, ((i+j)%2*255, (i+j)%2*255, (i+j)%2*255), (20+j*100, 20+i*100, 100, 100))    
@@ -50,6 +57,7 @@ class Game(object):
         pygame.quit()
             
     def draw(self):
+        """funcao que desenha o tabuleiro jogo"""
         i = 0
         self.window.fill((60,50,20))
         for i in range(len(self.board)):
@@ -77,6 +85,7 @@ class Game(object):
         pygame.display.flip()
     
     def menu(self):
+        """funcao que desenha o menu e espera ate utilizador escolher uma opcao"""
         self.font = pygame.font.SysFont("comicsansms", 72)
         i = 0
         self.window.fill((60,50,20))
@@ -103,6 +112,7 @@ class Game(object):
         
         
     def control(self):
+        """funcao que processar os cliques no tabuleiro do jogo"""
         while not (self.game_over() or self.quit):
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -128,6 +138,7 @@ class Game(object):
                                 return
 
     def move(self, i, j):
+        """funcao para validar e executar uma jogada"""
         piece = self.board[self.selected[0]][self.selected[1]]
         if piece == 0:
             return
