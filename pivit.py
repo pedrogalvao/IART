@@ -35,18 +35,18 @@ class Game(object):
         window_height = 840
         win = pygame.display.set_mode((window_width, window_height))
         self.window = win
+        self.menu()
+        self.play()
+        pygame.quit()
+        
+    def play(self):
+        """funcao que inicia o jogo"""        
         ini = time()
         self.board = [[0]+[Piece(i%2,1) for i in range(6)]+[0]]+[[Piece(i%2,0)]+[0 for i in range(6)]+[Piece(i%2,0)] for i in range(6)]+[[0]+[Piece(i%2,1) for i in range(6)]+[0]]
         self.buttons = [[i for i in range(8)] for j in range(8)]
         self.selected = None
         self.active_player = 0
         self.quit = False
-        self.menu()
-        self.play()
-        pygame.quit()
-        
-    def play(self):
-        """funcao que inicia o jogo"""
         for i in range(len(self.board)):
             for j in range(len(self.board[i])):
                 self.buttons[i][j] = pygame.draw.rect(self.window, ((i+j)%2*255, (i+j)%2*255, (i+j)%2*255), (20+j*100, 20+i*100, 100, 100))    
@@ -109,6 +109,25 @@ class Game(object):
                     for i in range(len(self.menu_buttons)):
                             if self.menu_buttons[i].collidepoint(pos):
                                 return
+
+    def game_over_screen(self):
+        """funcao que desenha a tela de fim de jogo"""
+        self.font = pygame.font.SysFont("comicsansms", 72)
+        i = 0
+        pygame.draw.rect(self.window, (60,50,20), (200, 200, 450, 300))
+        text = self.font.render("Game Over", True, (0, 0, 0))
+        self.window.blit(text, (240, 220))
+        text = self.font.render(self.winner+" wins", True, (0, 0, 0))
+        self.window.blit(text, (270, 330))
+        pygame.display.flip()
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.quit = True
+                    return
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_r:
+                        self.play()
         
         
     def control(self):
@@ -117,6 +136,9 @@ class Game(object):
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.quit = True
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_r:
+                        self.play()
                 elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                     ## if mouse is pressed get position of cursor ##
                     pos = pygame.mouse.get_pos()
@@ -196,7 +218,27 @@ class Game(object):
 
     def game_over(self):
         """verificar se o jogo acabou"""
-        pass
+        red = 0
+        blue = 0
+        for row in self.board:
+            for piece in row:
+                if piece != 0:
+                    if not piece.master:
+                        return False
+                    else:
+                        if piece.player:
+                            blue += 1
+                        else:
+                            red += 1
+        print('Game over')
+        if red > blue:
+            self.winner = "Red"
+        elif blue > red:
+            self.winner = "Blue"
+        else:
+            self.winner = "Nobody"
+        self.game_over_screen()
+        return True
 
 
 
