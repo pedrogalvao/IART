@@ -90,10 +90,10 @@ class Bot(object):
         print("Value:",value)
         return value
     
-    def minimax(self, board, depth=2, player=False, alpha=0, betha=0):
+    def minimax(self, board, depth=2, player=False, betha=999999):
         if depth == 0:
             return self.evaluate(board)
-        best_value = -9999999
+        alpha = -9999999
         for x in range(len(board)):
             for y in range(len(board[x])):
                 p = board[x][y]
@@ -106,16 +106,18 @@ class Bot(object):
                                 break
                             elif board[x][y+i] == 0:
                                 #print("move ", self.move(board,x,y,x,y+i))
-                                v = -self.minimax(self.move(board,x,y,x,y+i),  depth-1, player)
-                                if v > best_value:
-                                    best_value = v
-                                    best_move = (x,y,x,y+i)
+                                v = -self.minimax(self.move(board,x,y,x,y+i),  depth-1, player, alpha)
+                                alpha = max(v, alpha)
+                                best_move = (x,y,x,y+i)
+                                if alpha >= betha:
+                                    return alpha
                             elif board[x][y+i].player != self.player_number:
                                 #print("move ",self.move(board, x,y,x,y+i))
-                                v = -self.minimax(self.move(board,x,y,x,y+i), depth-1, player)
-                                if v > best_value:
-                                    best_value = v
-                                    best_move = (x,y,x,y+i)
+                                v = -self.minimax(self.move(board,x,y,x,y+i), depth-1, player, alpha)
+                                alpha = max(v, alpha)
+                                if alpha >= betha:
+                                    return alpha
+                                best_move = (x,y,x,y+i)
                                 break
                             else:
                                 #print("OOOOO1")
@@ -124,15 +126,16 @@ class Bot(object):
                             if y+i < 0:
                                 break
                             elif board[x][y+i] == 0:
-                                v = -self.minimax(self.move(board,x,y,x,y+i), depth-1, player)
-                                if v > best_value:
-                                    best_value = v
-                                    best_move = (x,y,x,y+i)
+                                v = -self.minimax(self.move(board,x,y,x,y+i), depth-1, player, alpha)
+                                alpha = max(v, alpha)
+                                best_move = (x,y,x,y+i)
+                                if alpha >= betha:
+                                    return alpha
                             elif board[x][y+i].player != self.player_number:
-                                v = -self.minimax(self.move(board,x,y,x,y+i), depth-1, player)
-                                if v > best_value:
-                                    best_value = v
-                                    best_move = (x,y,x,y+i)
+                                v = -self.minimax(self.move(board,x,y,x,y+i), depth-1, player, alpha)
+                                alpha = max(v, alpha)
+                                if alpha >= betha:
+                                    return alpha
                                 break
                             else:
                                 break
@@ -141,15 +144,15 @@ class Bot(object):
                             if x+i >= len(board):
                                 break
                             elif board[x+i][y] == 0:
-                                v = -self.minimax(self.move(board,x,y,x+i,y), depth-1, player)
-                                if v > best_value:
-                                    best_value = v
-                                    best_move = (x,y,x,y+i)
+                                v = -self.minimax(self.move(board,x,y,x+i,y), depth-1, player, alpha)
+                                alpha = max(v, alpha)
+                                betha = min(v, betha)
+                                best_move = (x,y,x,y+i)
                             elif board[x+i][y].player != self.player_number:
-                                v = -self.minimax(self.move(board,x,y,x+i,y), depth-1, player)
-                                if v > best_value:
-                                    best_value = v
-                                    best_move = (x,y,x,y+i)
+                                v = -self.minimax(self.move(board,x,y,x+i,y), depth-1, player, alpha)
+                                alpha = max(v, alpha)
+                                if alpha >= betha:
+                                    return alpha
                                 break
                             else:
                                 break
@@ -158,29 +161,30 @@ class Bot(object):
                             if x+i < 0:
                                 break
                             elif board[x+i][y] == 0:
-                                v = -self.minimax(self.move(board,x,y,x+i,y), depth-1, player)
-                                if v > best_value:
-                                    best_value = v
-                                    best_move = (x,y,x+i,y)
+                                v = -self.minimax(self.move(board,x,y,x+i,y), depth-1, player, alpha)
+                                alpha = max(v, alpha)
+                                if alpha >= betha:
+                                    return alpha
                             elif board[x+i][y].player != self.player_number:
-                                v = -self.minimax(self.move(board,x,y,x+i,y), depth-1, player)
-                                if v > best_value:
-                                    best_value = v
-                                    best_move = (x,y,x+i,y)
+                                v = -self.minimax(self.move(board,x,y,x+i,y), depth-1, player, alpha)
+                                alpha = max(v, alpha)
+                                if alpha >= betha:
+                                    return alpha
                                 break
                             else:
                                 break
-        print(" "*(3-depth)*2+str(depth)+"."+str(best_value))
-        return best_value
+        print(" "*(3-depth)*2+str(depth)+"."+str(alpha))
+        return alpha
     
 
 
 b = Bot()
 b.queue.put((1, [[pivit.Piece(1,0,0), 0, pivit.Piece(0,0,0)],[0,0,0],[0,0,0]]))
 #b.open_node()
-#best = b.value([[0]+[Piece(i%2,1) for i in range(4)]+[0]]+[[Piece(i%2,0)]+[0 for i in range(4)]+[Piece(i%2,0)] for i in range(4)]+[[0]+[Piece(i%2,1) for i in range(4)]+[0]],2,False)
-print([[0, Piece(1%2,0),0],[0,Piece(0%2,0),0]])
-best = b.minimax([[0, Piece(1%2,0)],[0,Piece(0%2,0)]],5,False)
+best = b.minimax([[0]+[Piece(i%2,1) for i in range(4)]+[0]]+[[Piece(i%2,0)]+[0 for i in range(4)]+[Piece(i%2,0)] for i in range(4)]+[[0]+[Piece(i%2,1) for i in range(4)]+[0]],2,False)
+#board = [[0, Piece(1,0),0,0],[0,Piece(1,1),0,0],[0,0,0,0],[0,0,0,0]]
+#print(board)
+#best = b.minimax(board,5,True)
 print(best)
 
 
