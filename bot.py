@@ -86,14 +86,14 @@ class Bot(object):
                         value += 1+piece.master
                     else:
                         value -= 1+piece.master
-        print(state)
+       # print(state)
         print("Value:",value)
         return value
     
-    def value(self, board, depth=2, player=False):
-        print(" "*(3-depth)*2+str(depth)+".")
+    def minimax(self, board, depth=2, player=False, alpha=0, betha=0):
         if depth == 0:
             return self.evaluate(board)
+        best_value = -9999999
         for x in range(len(board)):
             for y in range(len(board[x])):
                 p = board[x][y]
@@ -101,73 +101,86 @@ class Bot(object):
                     player = not player
                     #print("ok")
                     if p.direction == 0:
-                        #print("direction 0")
                         for i in range(1,5):
                             if y+i >= len(board[x]):
-                                #print("OOOOO")
                                 break
                             elif board[x][y+i] == 0:
                                 #print("move ", self.move(board,x,y,x,y+i))
-                                -self.value(self.move(board,x,y,x,y+i),  depth-1, player)
+                                v = -self.minimax(self.move(board,x,y,x,y+i),  depth-1, player)
+                                if v > best_value:
+                                    best_value = v
+                                    best_move = (x,y,x,y+i)
                             elif board[x][y+i].player != self.player_number:
                                 #print("move ",self.move(board, x,y,x,y+i))
-                                -self.value(self.move(board,x,y,x,y+i), depth-1, player)
+                                v = -self.minimax(self.move(board,x,y,x,y+i), depth-1, player)
+                                if v > best_value:
+                                    best_value = v
+                                    best_move = (x,y,x,y+i)
                                 break
                             else:
                                 #print("OOOOO1")
                                 break
                         for i in range(-1,-5,-1):
-                            print(i)
                             if y+i < 0:
-                                #print("OOOOO")
                                 break
                             elif board[x][y+i] == 0:
-                                #print("move ", self.move(board,x,y,x,y+i))
-                                self.value(self.move(board,x,y,x,y+i), depth-1, player)
+                                v = -self.minimax(self.move(board,x,y,x,y+i), depth-1, player)
+                                if v > best_value:
+                                    best_value = v
+                                    best_move = (x,y,x,y+i)
                             elif board[x][y+i].player != self.player_number:
-                                #print("move ",self.move(board, x,y,x,y+i))
-                                self.value(self.move(board,x,y,x,y+i), depth-1, player)
+                                v = -self.minimax(self.move(board,x,y,x,y+i), depth-1, player)
+                                if v > best_value:
+                                    best_value = v
+                                    best_move = (x,y,x,y+i)
                                 break
                             else:
-                                #print("OOOOO1")
                                 break
                     else:
                         for i in range(1,5):
                             if x+i >= len(board):
-                                #print("OOOOO2")
                                 break
                             elif board[x+i][y] == 0:
-                                #print("move ",self.move(board,x,y,x+i,y))
-                                self.value(self.move(board,x,y,x+i,y), depth-1, player)
+                                v = -self.minimax(self.move(board,x,y,x+i,y), depth-1, player)
+                                if v > best_value:
+                                    best_value = v
+                                    best_move = (x,y,x,y+i)
                             elif board[x+i][y].player != self.player_number:
-                                #print("move ",self.move(board,x,y,x+i,y))
-                                self.value(self.move(board,x,y,x+i,y), depth-1, player)
+                                v = -self.minimax(self.move(board,x,y,x+i,y), depth-1, player)
+                                if v > best_value:
+                                    best_value = v
+                                    best_move = (x,y,x,y+i)
                                 break
                             else:
-                                #print("OOOOO3")
                                 break
                         for i in range(-1,-5,-1):
                             print(i)
                             if x+i < 0:
-                                #print("OOOOO2")
                                 break
                             elif board[x+i][y] == 0:
-                                #print("move ",self.move(board,x,y,x+i,y))
-                                self.value(self.move(board,x,y,x+i,y), depth-1, player)
+                                v = -self.minimax(self.move(board,x,y,x+i,y), depth-1, player)
+                                if v > best_value:
+                                    best_value = v
+                                    best_move = (x,y,x+i,y)
                             elif board[x+i][y].player != self.player_number:
-                                #print("move ",self.move(board,x,y,x+i,y))
-                                self.value(self.move(board,x,y,x+i,y), depth-1, player)
+                                v = -self.minimax(self.move(board,x,y,x+i,y), depth-1, player)
+                                if v > best_value:
+                                    best_value = v
+                                    best_move = (x,y,x+i,y)
                                 break
                             else:
-                                #print("OOOOO3")
                                 break
-        
+        print(" "*(3-depth)*2+str(depth)+"."+str(best_value))
+        return best_value
     
 
 
 b = Bot()
 b.queue.put((1, [[pivit.Piece(1,0,0), 0, pivit.Piece(0,0,0)],[0,0,0],[0,0,0]]))
 #b.open_node()
-b.value([[0]+[Piece(i%2,1) for i in range(6)]+[0]]+[[Piece(i%2,0)]+[0 for i in range(6)]+[Piece(i%2,0)] for i in range(6)]+[[0]+[Piece(i%2,1) for i in range(6)]+[0]])
+#best = b.value([[0]+[Piece(i%2,1) for i in range(4)]+[0]]+[[Piece(i%2,0)]+[0 for i in range(4)]+[Piece(i%2,0)] for i in range(4)]+[[0]+[Piece(i%2,1) for i in range(4)]+[0]],2,False)
+print([[0, Piece(1%2,0),0],[0,Piece(0%2,0),0]])
+best = b.minimax([[0, Piece(1%2,0)],[0,Piece(0%2,0)]],5,False)
+print(best)
 
 
