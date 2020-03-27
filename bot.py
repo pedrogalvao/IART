@@ -8,6 +8,8 @@ Created on Mon Mar  9 10:42:50 2020
 from queue import PriorityQueue
 import copy
 
+from pivit import Piece
+
 class Bot(object):
     def __init__(self):
         self.alpha = -1e+10
@@ -88,14 +90,15 @@ class Bot(object):
         print("Value:",value)
         return value
     
-    def value(self, board, depth=2):
+    def value(self, board, depth=2, player=False):
         print(" "*(3-depth)*2+str(depth)+".")
         if depth == 0:
             return self.evaluate(board)
         for x in range(len(board)):
             for y in range(len(board[x])):
                 p = board[x][y]
-                if p != 0 and p.player == self.player_number:
+                if p != 0 and p.player == player:
+                    player = not player
                     #print("ok")
                     if p.direction == 0:
                         #print("direction 0")
@@ -105,10 +108,10 @@ class Bot(object):
                                 break
                             elif board[x][y+i] == 0:
                                 #print("move ", self.move(board,x,y,x,y+i))
-                                self.value(self.move(board,x,y,x,y+i), depth-1)
+                                -self.value(self.move(board,x,y,x,y+i),  depth-1, player)
                             elif board[x][y+i].player != self.player_number:
                                 #print("move ",self.move(board, x,y,x,y+i))
-                                self.value(self.move(board,x,y,x,y+i), depth-1)
+                                -self.value(self.move(board,x,y,x,y+i), depth-1, player)
                                 break
                             else:
                                 #print("OOOOO1")
@@ -120,10 +123,10 @@ class Bot(object):
                                 break
                             elif board[x][y+i] == 0:
                                 #print("move ", self.move(board,x,y,x,y+i))
-                                self.value(self.move(board,x,y,x,y+i), depth-1)
+                                self.value(self.move(board,x,y,x,y+i), depth-1, player)
                             elif board[x][y+i].player != self.player_number:
                                 #print("move ",self.move(board, x,y,x,y+i))
-                                self.value(self.move(board,x,y,x,y+i), depth-1)
+                                self.value(self.move(board,x,y,x,y+i), depth-1, player)
                                 break
                             else:
                                 #print("OOOOO1")
@@ -135,10 +138,10 @@ class Bot(object):
                                 break
                             elif board[x+i][y] == 0:
                                 #print("move ",self.move(board,x,y,x+i,y))
-                                self.value(self.move(board,x,y,x+i,y), depth-1)
+                                self.value(self.move(board,x,y,x+i,y), depth-1, player)
                             elif board[x+i][y].player != self.player_number:
                                 #print("move ",self.move(board,x,y,x+i,y))
-                                self.value(self.move(board,x,y,x+i,y), depth-1)
+                                self.value(self.move(board,x,y,x+i,y), depth-1, player)
                                 break
                             else:
                                 #print("OOOOO3")
@@ -150,10 +153,10 @@ class Bot(object):
                                 break
                             elif board[x+i][y] == 0:
                                 #print("move ",self.move(board,x,y,x+i,y))
-                                self.value(self.move(board,x,y,x+i,y), depth-1)
+                                self.value(self.move(board,x,y,x+i,y), depth-1, player)
                             elif board[x+i][y].player != self.player_number:
                                 #print("move ",self.move(board,x,y,x+i,y))
-                                self.value(self.move(board,x,y,x+i,y), depth-1)
+                                self.value(self.move(board,x,y,x+i,y), depth-1, player)
                                 break
                             else:
                                 #print("OOOOO3")
