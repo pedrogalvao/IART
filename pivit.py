@@ -8,7 +8,8 @@ import pygame
 from random import *
 from time import sleep
 from time import time
-
+from bot import Bot
+import copy
 
 class Piece(object):
     def __init__(self, player = 0, direction=0, master=False):
@@ -29,15 +30,17 @@ class Piece(object):
 
 class Game(object):
     def __init__(self):
-        self.currentLevel = 0
+        self.sequence = []
         pygame.init()
         window_width = 840
         window_height = 840
         win = pygame.display.set_mode((window_width, window_height))
         self.window = win
+        self.bot = Bot()
         self.menu()
         self.play()
         pygame.quit()
+        self.game_mode = 'HxC'
         
     def play(self):
         """funcao que inicia o jogo"""        
@@ -49,11 +52,29 @@ class Game(object):
         self.quit = False
         for i in range(len(self.board)):
             for j in range(len(self.board[i])):
-                self.buttons[i][j] = pygame.draw.rect(self.window, ((i+j)%2*255, (i+j)%2*255, (i+j)%2*255), (20+j*100, 20+i*100, 100, 100))    
+                self.buttons[i][j] = pygame.draw.rect(self.window, ((i+j)%2*255, (i+j)%2*255, (i+j)%2*255), (20+j*100, 20+i*100, 100, 100))
         self.draw()
+        self.play_cvc()
+
+    def play_pvp(self):
         while not (self.game_over() or self.quit):
             self.control()
+        pygame.quit()
+
+    def play_pvc(self):
+        while not (self.game_over() or self.quit):
+            if self.control():
+                if self.game_over() or self.quit:
+                    break
+                self.bot_move()
+        pygame.quit()
         
+    def play_cvc(self):
+        while not (self.game_over() or self.quit):
+            self.bot_move(False)
+            if self.game_over() or self.quit:
+                break
+            self.bot_move(True)
         pygame.quit()
             
     def draw(self):
@@ -131,7 +152,7 @@ class Game(object):
         
         
     def control(self):
-        """funcao que processar os cliques no tabuleiro do jogo"""
+        """funcao que processa os cliques no tabuleiro do jogo"""
         while not (self.game_over() or self.quit):
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -139,6 +160,11 @@ class Game(object):
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_r:
                         self.play()
+                    elif event.key == pygame.K_LEFT and len(self.sequence)>=2:
+                        self.sequence.pop()
+                        self.board = self.sequence.pop()
+                        self.draw()
+                        
                 elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                     ## if mouse is pressed get position of cursor ##
                     pos = pygame.mouse.get_pos()
@@ -151,31 +177,38 @@ class Game(object):
                                 elif self.selected == [i,j]:
                                     self.selected = None
                                 elif self.board[self.selected[0]][self.selected[1]]==0:
-                                    self.selected = [i,j]                                
+                                    self.selected = [i,j]
                                 else:
-                                    self.move(i,j)
-                                    self.selected = None
-                                print(i,j)
+                                    if self.move(i,j):
+                                        self.selected = None
+                                        self.draw()
+                                        return True
+                                    else:
+                                        self.selected = None
+                                        self.draw()
+                                        return False
+                                        
                                 self.draw()
-                                return
+                                return False
 
     def move(self, i, j):
         """funcao para validar e executar uma jogada"""
+        board_cpy = copy.deepcopy(self.board)
         piece = self.board[self.selected[0]][self.selected[1]]
         if piece == 0:
-            return
+            return False
         elif piece.player != self.active_player:
             print("it's not your turn", piece.player, self.active_player)
-            return
+            return False
         elif self.board[i][j] != 0:
             if piece.player == self.board[i][j].player:
                 print("can't capture your own pieces")
-                return
+                return False
         if i==self.selected[0] and piece.direction == 0:
             if piece.master == False:
                 if (i + j - sum(self.selected))%2 == 0:
                     print("must choose a different color")
-                    return
+                    return False
             if j < self.selected[1]:
                 spaces_between = [self.board[i][y] for y in range(j+1, self.selected[1])]
             else:
@@ -184,7 +217,7 @@ class Game(object):
             for p in spaces_between:
                 if p != 0:
                     print("can't jump pieces")
-                    return
+                    return False
             piece.direction = 1
             self.board[i][j] = piece
             self.board[self.selected[0]][self.selected[1]] = 0
@@ -192,7 +225,7 @@ class Game(object):
             if piece.master == False:
                 if (i + j - sum(self.selected))%2 == 0:
                     print("must choose a different color")
-                    return
+                    return False
             if i < self.selected[0]:
                 spaces_between = [self.board[x][j] for x in range(i+1, self.selected[0])]
             else:
@@ -201,44 +234,69 @@ class Game(object):
             for p in spaces_between:
                 if p != 0:
                     print("can't jump pieces")
-                    return
+                    return False
             piece.direction = 0
             self.board[i][j] = piece
             self.board[self.selected[0]][self.selected[1]] = 0
         else:
             print("Invalid movement")
-            return
+            return False
         if self.board[i][j] == 0:
             print("Something wrong happened")
-            return
+            return False
         elif (i==0 or i==7) and (j==0 or j==7):
             self.board[i][j].master = True
         self.active_player = (self.active_player+1)%2
+        self.sequence += [board_cpy]
+        return True
+
+    def bot_move(self, player=True):        
+        self.sequence += [copy.deepcopy(self.board)]
+        self.bot.choose_move(self.board, 2, player)
+        self.board = self.bot.best_move
+        self.active_player = (self.active_player+1)%2
+        self.draw()
         return
 
     def game_over(self):
         """verificar se o jogo acabou"""
-        red = 0
-        blue = 0
+        red_minion = 0
+        blue_minion = 0
+        red_master = 0
+        blue_master = 0
+        only_masters = True
         for row in self.board:
             for piece in row:
                 if piece != 0:
                     if not piece.master:
-                        return False
+                        if piece.player:
+                            blue_minion += 1
+                        else:
+                            red_minion += 1
+                        only_masters = False
                     else:
                         if piece.player:
-                            blue += 1
+                            blue_master += 1
                         else:
-                            red += 1
-        print('Game over')
-        if red > blue:
+                            red_master += 1
+        if blue_minion + blue_master == 0:
             self.winner = "Red"
-        elif blue > red:
+            self.game_over_screen()
+            return True
+        elif red_minion + red_master == 0:
             self.winner = "Blue"
-        else:
-            self.winner = "Nobody"
-        self.game_over_screen()
-        return True
+            self.game_over_screen()
+            return True
+        elif only_masters:
+            if red_master > blue_master:
+                self.winner = "Red"
+            elif blue_master > red_master:
+                self.winner = "Blue"
+            else:
+                self.winner = "Nobody"
+            self.game_over_screen()
+            return True
+        return False
 
 
 
@@ -247,4 +305,4 @@ class Game(object):
 
 
     
-#Game()
+Game()
