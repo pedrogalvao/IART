@@ -38,12 +38,26 @@ class Game(object):
         self.window = win
         self.bot = Bot()
         self.menu()
+        self.game_mode = 'HxC'
         self.play()
         pygame.quit()
-        self.game_mode = 'HxC'
-        
+    
+    def test(self):
+        count = {'Red':0,'Blue':0,'Nobody':0}
+        for i in range(10):
+            ini = time()
+            self.board = [[0]+[Piece(i%2,1) for i in range(6)]+[0]]+[[Piece(i%2,0)]+[0 for i in range(6)]+[Piece(i%2,0)] for i in range(6)]+[[0]+[Piece(i%2,1) for i in range(6)]+[0]]
+            self.buttons = [[i for i in range(8)] for j in range(8)]
+            self.selected = None
+            self.active_player = 0
+            self.quit = False
+            self.play_cvc()
+            print(self.winner)
+            count[self.winner] += 1
+
+
     def play(self):
-        """funcao que inicia o jogo"""        
+        """funcao que inicia o jogo"""
         ini = time()
         self.board = [[0]+[Piece(i%2,1) for i in range(6)]+[0]]+[[Piece(i%2,0)]+[0 for i in range(6)]+[Piece(i%2,0)] for i in range(6)]+[[0]+[Piece(i%2,1) for i in range(6)]+[0]]
         self.buttons = [[i for i in range(8)] for j in range(8)]
@@ -54,29 +68,30 @@ class Game(object):
             for j in range(len(self.board[i])):
                 self.buttons[i][j] = pygame.draw.rect(self.window, ((i+j)%2*255, (i+j)%2*255, (i+j)%2*255), (20+j*100, 20+i*100, 100, 100))
         self.draw()
-        self.play_cvc()
+        self.play_pvc()
 
     def play_pvp(self):
         while not (self.game_over() or self.quit):
             self.control()
-        pygame.quit()
+        #pygame.quit()
 
     def play_pvc(self):
+        self.bot_move(False,4)
         while not (self.game_over() or self.quit):
             if self.control():
                 if self.game_over() or self.quit:
                     break
-                self.bot_move()
-        pygame.quit()
+                self.bot_move(False,4)
+        #pygame.quit()
         
     def play_cvc(self):
         while not (self.game_over() or self.quit):
-            self.bot_move(False)
+            self.bot_move(False,2)
             if self.game_over() or self.quit:
                 break
-            self.bot_move(True)
-        pygame.quit()
-            
+            self.bot_move(True,3)
+        #pygame.quit()
+                
     def draw(self):
         """funcao que desenha o tabuleiro jogo"""
         i = 0
@@ -250,11 +265,14 @@ class Game(object):
         self.sequence += [board_cpy]
         return True
 
-    def bot_move(self, player=True):        
+    def bot_move(self, player=True, depth=3):        
         self.sequence += [copy.deepcopy(self.board)]
-        self.bot.choose_move(self.board, 2, player)
+        ini = time()
+        print("Value:", self.bot.choose_move(self.board, 3, player))
+        print("time to move:", ini - time())
         self.board = self.bot.best_move
         self.active_player = (self.active_player+1)%2
+        sleep(0.1)
         self.draw()
         return
 
