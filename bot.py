@@ -243,28 +243,13 @@ class Bot(object):
             list_of_moves = self.list_moves(board, player)
             if len(list_of_moves) == 0:
                 return -10e+5
-        if len(list_of_moves) == 0:
-            return -10e+5
-        if player:
-            value = -10e+5
-            for next_board in list_of_moves:
-                value = max(value, self.minimax(next_board, depth-1, not player, alpha, beta))
-                alpha = max(alpha, value)
-                if alpha >= beta:
-                    break
-               # if time() - self.initial_time > 0.5:
-                #    break
-            return value
-        else:
-            value = 10e+5
-            for next_board in list_of_moves:
-                value = min(value, self.minimax(next_board, depth-1, not player, alpha, beta))
-                beta = min(beta, value)
-                if alpha >= beta:
-                    break
-               # if time() - self.initial_time > 0.5:
-                #    break
-            return value
+        for next_board in list_of_moves:
+            score = -self.minimax(next_board, depth-1, not player, -beta, -alpha);
+            if score >= beta:
+                return beta   #  fail hard beta-cutoff
+            if score > alpha:
+                alpha = score # alpha acts like max in MiniMax
+        return alpha
     
     def choose_move(self, board, depth=2, player=True):
         self.initial_time = time()
@@ -285,35 +270,19 @@ class Bot(object):
             list_of_moves = self.list_moves(board, player)
             if len(list_of_moves) == 0:
                 return -10e+5
-       
         alpha = -10e+5
         beta = 10e+5
-        if player:
-            value = -10e+5
-            for next_board in list_of_moves:
-                value = max(value, self.minimax(next_board, depth-1, not player, alpha, beta))
-                if alpha < value:
-                    alpha = value
-                    self.best_move = copy.deepcopy(next_board)
-                    print("0, best_move",self.best_move)
-                if alpha >= beta:
-                    break
-                #if time() - self.initial_time > 0.5:
-                 #   break
-            return value
-        else:
-            value = 10e+5
-            for next_board in list_of_moves:
-                value = min(value, self.minimax(next_board, depth-1, not player, alpha, beta))
-                if beta > value:
-                    beta = value
-                    self.best_move = copy.deepcopy(next_board)
-                    print("1, best_move",self.best_move)
-                if alpha >= beta:
-                    break
-                #if time() - self.initial_time > 0.5:
-                 #   break
-            return value
+        for next_board in list_of_moves:
+            score = -self.minimax(next_board, depth-1, not player, -beta, -alpha);
+            if score >= beta:
+                self.best_move = copy.deepcopy(next_board)
+                print("beta cutoff, best_move",self.best_move)
+                return beta   #  fail hard beta-cutoff
+            if score > alpha:
+                alpha = score # alpha acts like max in MiniMax
+                self.best_move = copy.deepcopy(next_board)
+                print("alpha cutoff, best_move",self.best_move)
+        return alpha
     
 
 def print_board(board):
@@ -336,9 +305,9 @@ print("Board:",board)
 #print(best)
 for brd in b.list_moves(board,1):
     print(brd, b.evaluate(brd,1))
-b.choose_move(board,15,0)
+b.choose_move(board,15,1)
 print("Best move:")
 print_board(b.best_move)
-print("value:",b.choose_move(board,15,0))
+print("value:",b.choose_move(board,15,1))
 
 

@@ -68,7 +68,7 @@ class Game(object):
             for j in range(len(self.board[i])):
                 self.buttons[i][j] = pygame.draw.rect(self.window, ((i+j)%2*255, (i+j)%2*255, (i+j)%2*255), (20+j*100, 20+i*100, 100, 100))
         self.draw()
-        self.play_pvc()
+        self.play_cvc()
 
     def play_pvp(self):
         while not (self.game_over() or self.quit):
@@ -89,7 +89,7 @@ class Game(object):
             self.bot_move(False,2)
             if self.game_over() or self.quit:
                 break
-            self.bot_move(True,3)
+            self.bot_move(True,4)
         #pygame.quit()
                 
     def draw(self):
@@ -268,7 +268,7 @@ class Game(object):
     def bot_move(self, player=True, depth=3):        
         self.sequence += [copy.deepcopy(self.board)]
         ini = time()
-        print("Value:", self.bot.choose_move(self.board, 3, player))
+        print("Value:", self.bot.choose_move(self.board, depth, player))
         print("time to move:", ini - time())
         self.board = self.bot.best_move
         self.active_player = (self.active_player+1)%2
