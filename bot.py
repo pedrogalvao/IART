@@ -40,7 +40,7 @@ class Bot(object):
         board[x2][y2] = piece
         board[x1][y1] = 0
         board[x2][y2].direction = not board[x2][y2].direction
-        if (x2==0 or x2==7) and (y2==0 or y2==7):
+        if (x2==0 or x2==len(board)-1) and (y2==0 or y2==len(board)-1):
             board[x2][y2].master = True
         return board
     
