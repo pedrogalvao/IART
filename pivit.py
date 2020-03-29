@@ -60,6 +60,8 @@ class Game(object):
 
     def play(self):
         """funcao que inicia o jogo"""
+        if self.quit:
+            return
         game_type= self.game_mode[0]
         difficulty= self.game_mode[1]
         ini = time()
@@ -168,23 +170,27 @@ class Game(object):
                                 
    
     def difficulty_menu(self, title):
+        if self.quit:
+            return
         self.font = pygame.font.SysFont("comicsansms", 72)
         i = 0
         self.window.fill((60,50,20))
-        self.menu_buttons = [0,0,0,0]
-        for i in range(4):
-            self.menu_buttons[i] = pygame.draw.rect(self.window, (255, 255, 255), (270, 200+i*120, 300, 100))  
+        self.menu_buttons = [0,0,0,0,0]
+        for i in range(5):
+            self.menu_buttons[i] = pygame.draw.rect(self.window, (255, 255, 255), (250, 200+i*120, 400, 100))  
         
         text = self.font.render(title, True, (0, 128, 0))
         self.window.blit(text, (30, 100))
-        text = self.font.render("Easy", True, (0, 128, 0))
-        self.window.blit(text, (330, 200))
-        text = self.font.render("Normal", True, (0, 128, 0))
+        text = self.font.render("Very Easy", True, (0, 200, 0))
+        self.window.blit(text, (290, 200))
+        text = self.font.render("Easy", True, (100, 200, 0))
         self.window.blit(text, (330, 320))
-        text = self.font.render("Hard", True, (0, 128, 0))
+        text = self.font.render("Normal", True, (200, 200, 0))
         self.window.blit(text, (330, 440))
-        text = self.font.render("Very Hard", True, (0, 128, 0))
+        text = self.font.render("Hard", True, (255, 100, 0))
         self.window.blit(text, (330, 560))
+        text = self.font.render("Very Hard", True, (255, 0, 0))
+        self.window.blit(text, (290, 680))
         pygame.display.flip()
         while not self.quit:
             for event in pygame.event.get():
@@ -201,11 +207,15 @@ class Game(object):
                                 elif y_pos<=420 and y_pos>=320:
                                     return 2
                                 elif y_pos<=540 and y_pos>=420:
-                                    return 4
+                                    return 3
                                 elif y_pos<=660 and y_pos>=540:
+                                    return 4
+                                elif y_pos<=780 and y_pos>=660:
                                     return 5
 
     def size_menu(self):
+        if self.quit:
+            return
         self.font = pygame.font.SysFont("comicsansms", 72)
         i = 0
         self.window.fill((60,50,20))
