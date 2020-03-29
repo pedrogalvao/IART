@@ -251,7 +251,7 @@ class Bot(object):
                 alpha = score # alpha acts like max in MiniMax
         return alpha
     
-    def choose_move(self, board, depth=2, player=True):
+    def choose_move(self, board, depth, player=True):
         self.initial_time = time()
         if self.terminal_node(board, player):
             print("game over. no possible moves")

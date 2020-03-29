@@ -37,9 +37,9 @@ class Game(object):
         win = pygame.display.set_mode((window_width, window_height))
         self.window = win
         self.bot = Bot()
-        self.menu()
-        self.game_mode = 'HxC'
-        self.play()
+        game_mode = self.menu()
+        #self.game_mode = 'HxC'
+        self.play(game_mode[0], game_mode[1])
         pygame.quit()
     
     def test(self):
@@ -56,7 +56,7 @@ class Game(object):
             count[self.winner] += 1
 
 
-    def play(self):
+    def play(self, game_mode, difficulty):
         """funcao que inicia o jogo"""
         ini = time()
         self.board = [[0]+[Piece(i%2,1) for i in range(6)]+[0]]+[[Piece(i%2,0)]+[0 for i in range(6)]+[Piece(i%2,0)] for i in range(6)]+[[0]+[Piece(i%2,1) for i in range(6)]+[0]]
@@ -68,28 +68,33 @@ class Game(object):
             for j in range(len(self.board[i])):
                 self.buttons[i][j] = pygame.draw.rect(self.window, ((i+j)%2*255, (i+j)%2*255, (i+j)%2*255), (20+j*100, 20+i*100, 100, 100))
         self.draw()
-        self.play_cvc()
+        if game_mode==1:
+            self.play_pvp()
+        elif game_mode==2:
+            self.play_pvc(difficulty)
+        elif game_mode==3:
+            self.play_cvc(difficulty)
 
     def play_pvp(self):
         while not (self.game_over() or self.quit):
             self.control()
         #pygame.quit()
 
-    def play_pvc(self):
-        self.bot_move(False,4)
+    def play_pvc(self, difficulty):
+        self.bot_move(difficulty, False)
         while not (self.game_over() or self.quit):
             if self.control():
                 if self.game_over() or self.quit:
                     break
-                self.bot_move(False,4)
+                self.bot_move(difficulty, False)
         #pygame.quit()
         
-    def play_cvc(self):
+    def play_cvc(self, difficulty):
         while not (self.game_over() or self.quit):
-            self.bot_move(False,2)
+            self.bot_move(difficulty, False)
             if self.game_over() or self.quit:
                 break
-            self.bot_move(True,4)
+            self.bot_move(difficulty, True)
         #pygame.quit()
                 
     def draw(self):
@@ -144,7 +149,49 @@ class Game(object):
                     pos = pygame.mouse.get_pos()
                     for i in range(len(self.menu_buttons)):
                             if self.menu_buttons[i].collidepoint(pos):
-                                return
+                                y_pos=pos[1]
+                                difficulty=0
+                                if y_pos<=300 and y_pos>=200:
+                                    return [1,difficulty]
+                                elif y_pos<=420 and y_pos>=320:
+                                    difficulty=self.difficulty_menu()
+                                    return [2,difficulty]
+                                elif y_pos<=540 and y_pos>=420:
+                                    difficulty=self.difficulty_menu()
+                                    return [3,difficulty]
+                                
+   
+    def difficulty_menu(self):
+        self.font = pygame.font.SysFont("comicsansms", 72)
+        i = 0
+        self.window.fill((60,50,20))
+        self.menu_buttons = [0,0,0]
+        for i in range(3):
+            self.menu_buttons[i] = pygame.draw.rect(self.window, (255, 255, 255), (270, 200+i*120, 300, 100))            
+        text = self.font.render("Easy", True, (0, 128, 0))
+        self.window.blit(text, (330, 200))
+        text = self.font.render("Normal", True, (0, 128, 0))
+        self.window.blit(text, (330, 320))
+        text = self.font.render("Hard", True, (0, 128, 0))
+        self.window.blit(text, (330, 440))
+        pygame.display.flip()
+        while True:      
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.quit = True
+                    return
+                elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                    pos = pygame.mouse.get_pos()
+                    for i in range(len(self.menu_buttons)):
+                            if self.menu_buttons[i].collidepoint(pos):
+                                y_pos=pos[1]
+                                if y_pos<=300 and y_pos>=200:
+                                    return 1
+                                elif y_pos<=420 and y_pos>=320:
+                                    return 2
+                                elif y_pos<=540 and y_pos>=420:
+                                    return 3                
+                            
 
     def game_over_screen(self):
         """funcao que desenha a tela de fim de jogo"""
@@ -265,13 +312,15 @@ class Game(object):
         self.sequence += [board_cpy]
         return True
 
-    def bot_move(self, player=True, depth=3):        
+    def bot_move(self, depth, player=True):        
         self.sequence += [copy.deepcopy(self.board)]
         ini = time()
         print("Value:", self.bot.choose_move(self.board, depth, player))
         print("time to move:", ini - time())
         self.board = self.bot.best_move
         self.active_player = (self.active_player+1)%2
+        #print("-----------------------------------")
+        #print(self.bot.best_move)
         sleep(0.1)
         self.draw()
         return
