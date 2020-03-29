@@ -87,11 +87,7 @@ class Game(object):
         elif game_type==3:
             difficulty2 = self.game_mode[2]
             self.play_cvc(difficulty, difficulty2)
-        self.number_of_games +=1
-        if self.winner == 'Blue':
-            self.blue_victories += 1
-        elif self.winner == 'Red':
-            self.red_victories += 1
+
 
     def play_pvp(self):
         while not (self.game_over() or self.quit):
@@ -112,9 +108,9 @@ class Game(object):
             self.bot_move(difficulty, False)
             if self.game_over() or self.quit:
                 break
-            self.bot_move(difficulty2, True)
+            self.bot_move(difficulty2, True)        
         #pygame.quit()
-                
+
     def draw(self):
         """funcao que desenha o tabuleiro jogo"""
         i = 0
@@ -418,12 +414,16 @@ class Game(object):
         elif only_masters:
             if red_master > blue_master:
                 self.winner = "Red"
+                self.red_victories += 1
             elif blue_master > red_master:
                 self.winner = "Blue"
+                self.blue_victories += 1
             else:
                 self.winner = "Nobody"
+            self.number_of_games +=1
             self.game_over_screen()
             return True
+        
         return False
 
 
