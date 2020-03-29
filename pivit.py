@@ -88,9 +88,9 @@ class Game(object):
             difficulty2 = self.game_mode[2]
             self.play_cvc(difficulty, difficulty2)
         self.number_of_games +=1
-        if self.winner = 'Blue':
+        if self.winner == 'Blue':
             self.blue_victories += 1
-        elif self.winner = 'Red':
+        elif self.winner == 'Red':
             self.red_victories += 1
 
     def play_pvp(self):
