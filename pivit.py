@@ -33,6 +33,7 @@ class Game(object):
     def __init__(self):
         self.sequence = []
         self.times = []
+        self.number_of_games = 0
         pygame.init()
         self.quit = False
         window_width = 840
@@ -84,6 +85,7 @@ class Game(object):
         elif game_type==3:
             difficulty2 = self.game_mode[2]
             self.play_cvc(difficulty, difficulty2)
+        self.number_of_games +=1
 
     def play_pvp(self):
         while not (self.game_over() or self.quit):
@@ -426,4 +428,6 @@ G = Game()
 print("Tempo medio:", np.mean(G.times))
 print("Desvio padrao:", np.std(G.times))
 print("Numero de jogadas contadas:", len(G.times))
+print("Numero de jogadas por partida:", len(G.times)/G.number_of_games)
+print("Numero de partidas:", G.number_of_games)
 
