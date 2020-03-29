@@ -10,6 +10,7 @@ from time import sleep
 from time import time
 from bot import Bot
 import copy
+import numpy as np
 
 class Piece(object):
     def __init__(self, player = 0, direction=0, master=False):
@@ -31,6 +32,7 @@ class Piece(object):
 class Game(object):
     def __init__(self):
         self.sequence = []
+        self.times = []
         pygame.init()
         self.quit = False
         window_width = 840
@@ -42,6 +44,7 @@ class Game(object):
         #self.game_mode = 'HxC'
         self.board_size = self.size_menu()
         self.play()
+        print("Tempo medio:",np.mean(self.times))
         pygame.quit()
     
     def test(self):
@@ -256,7 +259,7 @@ class Game(object):
         text = self.font.render(self.winner+" wins", True, (0, 0, 0))
         self.window.blit(text, (270, 330))
         pygame.display.flip()
-        while True:
+        while not self.quit:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.quit = True
@@ -368,10 +371,10 @@ class Game(object):
         self.sequence += [copy.deepcopy(self.board)]
         ini = time()
         print("Value:", self.bot.choose_move(self.board, depth, player))
-        print("time to move:", ini - time())
+        print("time to move:", time() - ini)
+        self.times += [time()-ini]
         self.board = self.bot.best_move
         self.active_player = (self.active_player+1)%2
-        sleep(0.1)
         self.draw()
         return
 
@@ -418,8 +421,9 @@ class Game(object):
 
 
 
-
-
-
     
-Game()
+G = Game()
+print("Tempo medio:", np.mean(G.times))
+print("Desvio padrao:", np.std(G.times))
+print("Numero de jogadas contadas:", len(G.times))
+

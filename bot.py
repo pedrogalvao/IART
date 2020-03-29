@@ -223,10 +223,8 @@ class Bot(object):
 
 
     def minimax(self, board, depth, player, alpha, beta):
-        self.initial_time = time()        
-        #print('.')
+        self.initial_time = time()
         if self.terminal_node(board, player):
-            #print("winner:",self.winner)
             if self.winner == player:
                 return 10e+5
             elif self.winner == 2:
@@ -254,8 +252,6 @@ class Bot(object):
     def choose_move(self, board, depth, player=True):
         self.initial_time = time()
         if self.terminal_node(board, player):
-            print("game over. no possible moves")
-            print("winner:",self.winner)
             if self.winner == player:
                 return 10e+5
             elif self.winner == 2:
@@ -276,12 +272,10 @@ class Bot(object):
             score = -self.minimax(next_board, depth-1, not player, -beta, -alpha);
             if score >= beta:
                 self.best_move = copy.deepcopy(next_board)
-                print("beta cutoff, best_move",self.best_move)
                 return beta   #  fail hard beta-cutoff
             if score > alpha:
                 alpha = score # alpha acts like max in MiniMax
                 self.best_move = copy.deepcopy(next_board)
-                print("alpha cutoff, best_move",self.best_move)
         return alpha
     
 
@@ -296,18 +290,20 @@ def print_board(board):
             else:
                 s += str(p)
         print(s)
-b = Bot()
+
+
+#b = Bot()
 #b.open_node()
 #best = b.minimax([[0]+[Piece(i%2,1) for i in range(4)]+[0]]+[[Piece(i%2,0)]+[0 for i in range(4)]+[Piece(i%2,0)] for i in range(4)]+[[0]+[Piece(i%2,1) for i in range(4)]+[0]],4,False)
-board = [[0, Piece(1,1),0,0],[0,Piece(0,1),0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]
-print("Board:",board)
+#board = [[0, Piece(1,1),0,0],[0,Piece(0,1),0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]
+#print("Board:",board)
 #best = b.minimax(board,5,True)
 #print(best)
-for brd in b.list_moves(board,1):
-    print(brd, b.evaluate(brd,1))
-b.choose_move(board,15,1)
-print("Best move:")
-print_board(b.best_move)
-print("value:",b.choose_move(board,15,1))
+#for brd in b.list_moves(board,1):
+#    print(brd, b.evaluate(brd,1))
+#b.choose_move(board,15,1)
+#print("Best move:")
+#print_board(b.best_move)
+#print("value:",b.choose_move(board,15,1))
 
 
