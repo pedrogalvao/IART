@@ -104,11 +104,21 @@ class Game(object):
         #pygame.quit()
         
     def play_cvc(self, difficulty, difficulty2):
+        i=0
         while not (self.game_over() or self.quit):
-            self.bot_move(difficulty, False)
-            if self.game_over() or self.quit:
-                break
-            self.bot_move(difficulty2, True)        
+            self.bot_move(difficulty, i%2)
+            i+=1
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.quit = True
+                    return
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_r:
+                        self.play()
+                    elif event.key == pygame.K_t:
+                        self.tip()
+                    elif event.key == pygame.K_m:
+                        self.__init__()
         #pygame.quit()
 
     def draw(self):
@@ -159,6 +169,13 @@ class Game(object):
                 if event.type == pygame.QUIT:
                     self.quit = True
                     return
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_r:
+                        self.play()
+                    elif event.key == pygame.K_t:
+                        self.tip()
+                    elif event.key == pygame.K_m:
+                        self.__init__()
                 elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                     pos = pygame.mouse.get_pos()
                     for i in range(len(self.menu_buttons)):
@@ -204,6 +221,14 @@ class Game(object):
                 if event.type == pygame.QUIT:
                     self.quit = True
                     return
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_r:
+                        self.play()
+                    elif event.key == pygame.K_t:
+                        self.tip()
+                    elif event.key == pygame.K_m:
+                        self.__init__()
+        
                 elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                     pos = pygame.mouse.get_pos()
                     for i in range(len(self.menu_buttons)):
@@ -242,6 +267,13 @@ class Game(object):
                 if event.type == pygame.QUIT:
                     self.quit = True
                     return
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_r:
+                        self.play()
+                    elif event.key == pygame.K_t:
+                        self.tip()
+                    elif event.key == pygame.K_m:
+                        self.__init__()
                 elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                     pos = pygame.mouse.get_pos()
                     for i in range(len(self.menu_buttons)):
@@ -268,9 +300,15 @@ class Game(object):
                 if event.type == pygame.QUIT:
                     self.quit = True
                     return
+                if event.type == pygame.QUIT:
+                    self.quit = True
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_r:
                         self.play()
+                    elif event.key == pygame.K_t:
+                        self.tip()
+                    elif event.key == pygame.K_m:
+                        self.__init__()
         
         
     def control(self):
@@ -282,10 +320,22 @@ class Game(object):
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_r:
                         self.play()
+                    elif event.key == pygame.K_m:
+                        self.__init__()
                     elif event.key == pygame.K_LEFT and len(self.sequence)>=2:
                         self.sequence.pop()
                         self.board = self.sequence.pop()
                         self.draw()
+                    elif event.key == pygame.K_1:
+                        self.tip(1)
+                    elif event.key == pygame.K_2:
+                        self.tip(2)
+                    elif event.key == pygame.K_3:
+                        self.tip(3)
+                    elif event.key == pygame.K_4:
+                        self.tip(4)
+                    elif event.key == pygame.K_5:
+                        self.tip(5)
                         
                 elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                     ## if mouse is pressed get position of cursor ##
@@ -379,6 +429,7 @@ class Game(object):
         self.times += [time()-ini]
         self.board = self.bot.best_move
         self.active_player = (self.active_player+1)%2
+        sleep(0.5)
         self.draw()
         return
 
@@ -405,10 +456,14 @@ class Game(object):
                             red_master += 1
         if blue_minion + blue_master == 0:
             self.winner = "Red"
+            self.red_victories += 1
+            self.number_of_games +=1
             self.game_over_screen()
             return True
         elif red_minion + red_master == 0:
             self.winner = "Blue"
+            self.blue_victories += 1
+            self.number_of_games +=1
             self.game_over_screen()
             return True
         elif only_masters:
@@ -425,18 +480,31 @@ class Game(object):
             return True
         
         return False
-
+    
+    def tip(self, level):
+        board = copy.deepcopy(self.board)
+        self.bot.choose_move(self.board, level, self.active_player)
+        self.board = self.bot.best_move
+        print("best move:", self.board)
+        self.draw()
+        pygame.event.get()
+        sleep(1)
+        self.board = board
+        self.draw()
+        return
 
 
 
     
 G = Game()
-print("Tempo medio:", np.mean(G.times))
-print("Desvio padrao:", np.std(G.times))
-print("Numero de jogadas contadas:", len(G.times))
-print("Numero de jogadas por partida:", len(G.times)/G.number_of_games)
-print("Numero de partidas:", G.number_of_games)
-print("Vermelho:", G.red_victories)
-print("Azul:", G.blue_victories)
-print("Empates:", G.number_of_games-G.red_victories-G.blue_victories)
+
+if G.number_of_games > 0:
+    print("Tempo medio:", np.mean(G.times))
+    print("Desvio padrao:", np.std(G.times))
+    print("Numero de jogadas contadas:", len(G.times))
+    print("Numero de jogadas por partida:", len(G.times)/G.number_of_games)
+    print("Numero de partidas:", G.number_of_games)
+    print("Vermelho:", G.red_victories)
+    print("Azul:", G.blue_victories)
+    print("Empates:", G.number_of_games-G.red_victories-G.blue_victories)
 
