@@ -7,14 +7,16 @@ Created on Fri May 15 12:19:35 2020
 from collections import deque
 import numpy as np
 import random
+from tensorflow.keras.layers import Conv2D
 from tensorflow.keras.layers import Dense
+from tensorflow.keras.layers import Flatten
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.optimizers import Adam
 
 # Deep Q-learning Agent
 class DQNAgent:
-    def __init__(self, state_size, action_size):
-        self.state_size = state_size
+    def __init__(self, board_size, action_size):
+        self.board_size = board_size
         self.action_size = action_size
         self.memory = deque(maxlen=2000)
         self.gamma = 0.95    # discount rate
@@ -25,13 +27,13 @@ class DQNAgent:
         self.model = self._build_model()
 
     def _build_model(self):
-        # Neural Net for Deep-Q learning Model
+        # Neural Net for Deep-Q learning 
         model = Sequential()
-        model.add(Dense(24, input_dim=self.state_size, activation='relu'))
-        model.add(Dense(24, activation='relu'))
-        model.add(Dense(self.action_size, activation='linear'))
-        model.compile(loss='mse',
-                      optimizer=Adam(lr=self.learning_rate))
+        model.add(Conv2D(32, kernel_size=3, activation='relu', input_shape=(self.board_size,self.board_size,5)))
+        model.add(Conv2D(16, kernel_size=3, activation='relu'))
+        model.add(Flatten())
+        model.add(Dense(10, activation='softmax'))
+        model.compile(loss='mse', optimizer=Adam(lr=self.learning_rate))
         return model
 
     def memorize(self, state, action, reward, next_state, done):
@@ -48,8 +50,7 @@ class DQNAgent:
         for state, action, reward, next_state, done in minibatch:
             target = reward
             if not done:
-              target = reward + self.gamma * \
-                       np.amax(self.model.predict(next_state)[0])
+              target = reward + self.gamma * np.amax(self.model.predict(next_state)[0])
             target_f = self.model.predict(state)
             target_f[0][action] = target
             self.model.fit(state, target_f, epochs=1, verbose=0)

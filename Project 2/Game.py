@@ -170,7 +170,7 @@ class Game(object):
                     self.quit = True
                     return
                 elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_r:
+                    if even v7t.key == pygame.K_r:
                         self.play()
                     elif event.key == pygame.K_t:
                         self.tip()
