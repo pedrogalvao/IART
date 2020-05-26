@@ -59,9 +59,8 @@ class PivitEnv(gym.Env):
         self.active_player=0
         self.board_size = board_size
         self.observation_space = spaces.Box(low=0, high=1, shape=(board_size, board_size, 5), dtype=np.uint8)
+        self.action_space = spaces.Box(low=0, high=1, shape=(board_size, board_size, 2), dtype=np.uint8)
         self.reset()
-        basic_space = spaces.Tuple([spaces.MultiBinary(board_size) for i in range(board_size)])
-        self.action_space = spaces.Tuple([copy.deepcopy(basic_space) for i in range(board_size)])
         # Example for using image as input:
 
     def step(self, action):
