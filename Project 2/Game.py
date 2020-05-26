@@ -496,15 +496,15 @@ class Game(object):
 
 
     
-G = Game()
+# G = Game()
 
-if G.number_of_games > 0:
-    print("Tempo medio:", np.mean(G.times))
-    print("Desvio padrao:", np.std(G.times))
-    print("Numero de jogadas contadas:", len(G.times))
-    print("Numero de jogadas por partida:", len(G.times)/G.number_of_games)
-    print("Numero de partidas:", G.number_of_games)
-    print("Vermelho:", G.red_victories)
-    print("Azul:", G.blue_victories)
-    print("Empates:", G.number_of_games-G.red_victories-G.blue_victories)
+# if G.number_of_games > 0:
+#     print("Tempo medio:", np.mean(G.times))
+#     print("Desvio padrao:", np.std(G.times))
+#     print("Numero de jogadas contadas:", len(G.times))
+#     print("Numero de jogadas por partida:", len(G.times)/G.number_of_games)
+#     print("Numero de partidas:", G.number_of_games)
+#     print("Vermelho:", G.red_victories)
+#     print("Azul:", G.blue_victories)
+#     print("Empates:", G.number_of_games-G.red_victories-G.blue_victories)
 

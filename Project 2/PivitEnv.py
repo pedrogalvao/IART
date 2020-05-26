@@ -3,7 +3,7 @@ import gym
 from gym import spaces
 import copy
 import numpy as np
-
+from Game import Piece
 
 def board_to_box(board):
     blue_hor = []
@@ -11,7 +11,7 @@ def board_to_box(board):
     red_ver = []
     red_hor = []
     masters = []
-    state = [red_hor]+[red_ver]+[blue_ver]+[blue_hor]+[masters]
+    state = [red_hor]+[red_ver]+[blue_hor]+[blue_ver]+[masters]
     for row in board:
         for i in state:
             i.append([])
@@ -37,9 +37,42 @@ def board_to_box(board):
                 
 def box_to_board(box):
     board = []
-    for i in range(box[0][0]):
-        for j in range(box[0][0]):
-            pass
+    blue_hor = box[2]
+    blue_ver = box[3]
+    red_ver = box[1]
+    red_hor = box[0]
+    masters = box[4]
+    for i in range(len(box[0][0])):
+        board.append([])
+        for j in range(len(box[0][0])):
+            if red_hor[i][j]==1:
+                if masters[i][j]==1:
+                    board[-1].append(Piece(0,0,1))
+                else:
+                    board[-1].append(Piece(0,0,0))
+            elif red_ver[i][j]==1:
+                if masters[i][j]==1:
+                    board[-1].append(Piece(0,1,1))
+                else:
+                    board[-1].append(Piece(0,1,0))
+            elif blue_hor[i][j]==1:
+                if masters[i][j]==1:
+                    board[-1].append(Piece(1,0,1))
+                else:
+                    board[-1].append(Piece(1,0,0))
+            elif blue_ver[i][j]==1:
+                if masters[i][j]==1:
+                    board[-1].append(Piece(1,1,1))
+                else:
+                    board[-1].append(Piece(1,1,0))
+            else:
+                board[-1].append(0)
+    return board
+                    
+                    
+                    
+                    
+                
 
 
 
@@ -92,7 +125,7 @@ class PivitEnv(gym.Env):
         self.blue_hor = [[0 for i in range(self.board_size)]]+[[(j+1)%2]+[0 for i in range(self.board_size-2)]+[(j+1)%2] for j in range(self.board_size-2)]+[[0 for i in range(self.board_size)]]
         self.blue_ver = [[0]+[(i+1)%2 for i in range(self.board_size-2)]+[0]]+[[0 for i in range(self.board_size)] for j in range(self.board_size-2)]+[[0]+[(i+1)%2 for i in range(self.board_size-2)]+[0]]
         self.masters = [[0 for i in range(self.board_size)] for j in range(self.board_size)]
-        self.state = [self.red_hor]+[self.red_ver]+[self.blue_ver]+[self.blue_hor]+[self.masters]
+        self.state = [self.red_hor]+[self.red_ver]+[self.blue_hor]+[self.blue_ver]+[self.masters]
         return self.observation_space.sample()
     
     def render(self, mode='human', close=False):
