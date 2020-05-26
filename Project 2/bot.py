@@ -276,7 +276,7 @@ class Bot(object):
             if score > alpha:
                 alpha = score # alpha acts like max in MiniMax
                 self.best_move = copy.deepcopy(next_board)
-        return alpha
+        return self.best_move
     
 
 def print_board(board):
