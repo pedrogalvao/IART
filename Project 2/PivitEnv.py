@@ -98,8 +98,11 @@ class PivitEnv(gym.Env):
 
     def step(self, action):
         # Execute one time step within the environment
+        done  = False
+        reward = []
+        new_state = []
         if self.active_player==0:    
-            #prev_score = sum(self.red_ver)+sum(self.red_hor)-sum(self.blue_hor)-sum(self.blue_ver)
+            prev_score = sum([sum(i) for i in self.red_ver])+sum([sum(i) for i in self.red_hor])-sum([sum(i) for i in self.blue_hor])-sum([sum(i) for i in self.blue_ver])
             if self.red_hor[action[0][0]][action[0][1]] == 1:
                 self.red_hor[action[0][0]][action[0][1]] = 0
                 self.red_ver[action[1][0]][action[1][1]] = 1
@@ -114,7 +117,17 @@ class PivitEnv(gym.Env):
             if self.blue_ver[action[0][0]][action[0][1]] == 1:
                 self.blue_hor[action[1][0]][action[1][1]] = 1
                 self.blue_ver[action[0][0]][action[0][1]] = 0
+            
+        reward = sum([sum(i) for i in self.red_ver])+sum([sum(i) for i in self.red_hor])-sum([sum(i) for i in self.blue_hor])-sum([sum(i) for i in self.blue_ver]) - prev_score
+        new_state = (self.red_hor, self.red_ver, self.blue_hor, self.blue_ver)
+        
+        if sum([sum(i) for i in self.red_ver])+sum([sum(i) for i in self.red_hor]) == 0 or sum([sum(i) for i in self.blue_hor])+sum([sum(i) for i in self.blue_ver]) == 0 or sum([sum(i) for i in self.red_ver])+sum([sum(i) for i in self.red_hor]) + sum([sum(i) for i in self.blue_hor])+sum([sum(i) for i in self.blue_ver]) == 0:
+            done = True
+        
         self.active_player = not self.active_player
+        
+        return new_state, reward, done
+        
     
         
         
