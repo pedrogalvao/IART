@@ -71,55 +71,7 @@ def box_to_board(box):
                     
                     
                     
-    def validMove(action):
-           
-           board = self.box_to_board((red_hor, red_ver, blue_hor, blue_ver))
-           
-           board_cpy = copy.deepcopy(board)
-           piece = board[action[0][0]][action[0][1]]
-           if piece == 0:
-               return False
-           elif piece.player != self.active_player:
-               return False
-           elif board[action[1][0]][action[1][1]] != 0:
-              if piece.player == board[action[1][0]][action[1][1]].player:
-                   return False
-           if action[1][0]==action[0][0] and piece.direction == 0:
-               if piece.master == False:
-                   if ((action[1][0] + action[1][1]) - sum(action[0][0], action[0][1]))%2 == 0:
-                       return False
-               if action[1][1] < action[0][1]:
-                   spaces_between = [board[action[1][0]][y] for y in range(action[1][1]+1, action[0][1])]
-               else:
-                   spaces_between = [self.board[i][y] for y in range(action[0][1]+1, action[1][1])]
-               for p in spaces_between:
-                   if p != 0:
-                       return False
-               piece.direction = 1
-               board[action[1][0]][action[1][1]] = piece
-               board[action[0][0]][action[0][1]] = 0
-           elif action[1][1]==action[0][1] and piece.direction == 1:
-               if piece.master == False:
-                   if (action[0][1] + action[1][1] - sum(action[0][0], action[0][1]))%2 == 0:
-                       return False
-               if action[1][0] < action[0][0]:
-                   spaces_between = [board[x][action[1][1]] for x in range(action[1][0]+1, action[0][0])]
-               else:
-                   spaces_between = [board[x][action[1][1]] for x in range(action[0][0]+1, action[1][0])]  
-               print(spaces_between)
-               for p in spaces_between:
-                   if p != 0:
-                       return False
-               piece.direction = 0
-               board[action[1][0]][action[1][1]] = piece
-               board[action[0][0]][action[0][1]] = 0
-           else:
-               return False
-           if board[action[1][0]][action[1][1]] == 0:
-               return False
-           elif (action[1][0]==0 or i==self.board_size-1) and (action[1][1]==0 or j==self.board_size-1):
-               board[action[1][0]][action[1][1]].master = True
-           return True              
+
                 
 
 
@@ -152,9 +104,9 @@ class PivitEnv(gym.Env):
         reward = []
         new_state = []
 
-        if validMove(action) == False:
+        if self.validMove(action) == False:
             print("Invalid Move")
-            return (self.red_hor, self.red_ver, self.blue_hor, self.blue_ver), 0, False
+            return self.state, -20, False, {}
     
         prev_score = sum([sum(i) for i in self.red_ver])+sum([sum(i) for i in self.red_hor])-sum([sum(i) for i in self.blue_hor])-sum([sum(i) for i in self.blue_ver])
         
@@ -233,3 +185,52 @@ class PivitEnv(gym.Env):
     def render(self, mode='human', close=False):
         # Render the environment to the screen
         pass
+
+    def validMove(self, action):
+           
+           board = box_to_board([self.red_hor, self.red_ver, self.blue_hor, self.blue_ver, self.masters])
+          
+           piece = board[action[0][0]][action[0][1]]
+           if piece == 0:
+               return False
+           elif piece.player != self.active_player:
+               return False
+           elif board[action[1][0]][action[1][1]] != 0:
+              if piece.player == board[action[1][0]][action[1][1]].player:
+                   return False
+           if action[1][0]==action[0][0] and piece.direction == 0:
+               if piece.master == False:
+                   if ((action[1][0] + action[1][1]) - sum(action[0][0], action[0][1]))%2 == 0:
+                       return False
+               if action[1][1] < action[0][1]:
+                   spaces_between = [board[action[1][0]][y] for y in range(action[1][1]+1, action[0][1])]
+               else:
+                   spaces_between = [board[action[1][0]][y] for y in range(action[0][1]+1, action[1][1])]
+               for p in spaces_between:
+                   if p != 0:
+                       return False
+               piece.direction = 1
+               board[action[1][0]][action[1][1]] = piece
+               board[action[0][0]][action[0][1]] = 0
+           elif action[1][1]==action[0][1] and piece.direction == 1:
+               if piece.master == False:
+                   if (action[0][1] + action[1][1] - sum(action[0][0], action[0][1]))%2 == 0:
+                       return False
+               if action[1][0] < action[0][0]:
+                   spaces_between = [board[x][action[1][1]] for x in range(action[1][0]+1, action[0][0])]
+               else:
+                   spaces_between = [board[x][action[1][1]] for x in range(action[0][0]+1, action[1][0])]  
+               print(spaces_between)
+               for p in spaces_between:
+                   if p != 0:
+                       return False
+               piece.direction = 0
+               board[action[1][0]][action[1][1]] = piece
+               board[action[0][0]][action[0][1]] = 0
+           else:
+               return False
+           if board[action[1][0]][action[1][1]] == 0:
+               return False
+           elif (action[1][0]==0 or action[1][0]==self.board_size-1) and (action[1][1]==0 or action[1][1]==self.board_size-1):
+               board[action[1][0]][action[1][1]].master = True
+           return True              

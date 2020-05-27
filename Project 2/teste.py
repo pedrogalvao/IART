@@ -59,6 +59,7 @@ class Test:
                     done = False
                     index = 0
                     while not done:
+                         print('.')
     #                    self.env.render()
                          #action = self.agent.act(state)
                          action = self.minimax.act(box_to_board(state),1,index%2)
@@ -71,28 +72,28 @@ class Test:
                          if index==100:
                              break
                     print("Episode", index_episode, "Number of moves:", index + 1)
-                    self.dqnagent.replay(self.sample_batch_size)
+                    #self.dqnagent.replay(self.sample_batch_size)
                     
-                for index_episode in range(self.episodes):
-                    state = self.env.reset()
-                    #state = np.reshape(state, [1, self.state_size])
-                    done = False
-                    index = 0
-                    while not done:
-    #                    self.env.render()
-                         #action = self.agent.act(state)
-                         action = self.dqnagent.act(state)
-                         next_state, reward, done, _ = self.env.step(action)
-                         #next_state = np.reshape(next_state, [1, self.state_size])    
-                         self.dqnagent.memorize(state, action, reward, next_state, done)
-                         state = next_state
-                         index += 1
-                         #print(index)
-                         if index==100:
-                             break
-                    print(state)
-                    print("Episode", index_episode, "Number of moves:", index + 1)
-                    self.dqnagent.replay(self.sample_batch_size)
+    #             for index_episode in range(self.episodes):
+    #                 state = self.env.reset()
+    #                 #state = np.reshape(state, [1, self.state_size])
+    #                 done = False
+    #                 index = 0
+    #                 while not done:
+    # #                    self.env.render()
+    #                      #action = self.agent.act(state)
+    #                      action = self.dqnagent.act(state)
+    #                      next_state, reward, done, _ = self.env.step(action)
+    #                      #next_state = np.reshape(next_state, [1, self.state_size])    
+    #                      self.dqnagent.memorize(state, action, reward, next_state, done)
+    #                      state = next_state
+    #                      index += 1
+    #                      #print(index)
+    #                      if index==100:
+    #                          break
+    #                 print(state)
+    #                 print("Episode", index_episode, "Number of moves:", index + 1)
+    #                 self.dqnagent.replay(self.sample_batch_size)
             finally:
                 self.dqnagent.save_model()
                 
