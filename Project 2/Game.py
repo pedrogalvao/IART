@@ -25,7 +25,11 @@ class Piece(object):
             m=""
         return "P"+str(self.player)+" "+str(self.direction)+m
         
-        
+    def __eq__(self, other):
+        try:
+            return other.master==self.master and self.player==other.player and self.direction==other.direction
+        except:
+            return False
 
 
 

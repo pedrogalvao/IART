@@ -195,42 +195,39 @@ class PivitEnv(gym.Env):
         x2=action[1][0]
         y2=action[1][1]
         piece = board[x1][y1]
-        print(piece)
         if piece == 0:
+            print('a')
             return False
         elif piece.player != self.active_player:
+            print('b')
             return False
         elif board[x2][y2] != 0:
            if piece.player == board[x2][y2].player:
+                print('c')
                 return False
         if piece.master == False:
             if (x1+x2+y1+y2)%2 == 0:
+                print('d')
                 return False
-        if y1==y2 and piece.direction == 0:
+        if x1==x2 and piece.direction == 0:
             if action[1][1] < action[0][1]:
-                spaces_between = [board[action[1][0]][y] for y in range(action[1][1]+1, action[0][1])]
+                spaces_between = [board[x1][y] for y in range(y2+1, y1)]
             else:
-                spaces_between = [board[action[1][0]][y] for y in range(action[0][1]+1, action[1][1])]
+                spaces_between = [board[x1][y] for y in range(y1+1, y2)]
             for p in spaces_between:
                 if p != 0:
+                    print('e')
                     return False
-            piece.direction = 1
-            board[action[1][0]][action[1][1]] = piece
-            board[action[0][0]][action[0][1]] = 0
-        elif action[1][1]==action[0][1] and piece.direction == 1:
+        elif y1==y2 and piece.direction == 1:
             if x2 < x1:
                 spaces_between = [board[x][y2] for x in range(x2+1, x1)]
             else:
                 spaces_between = [board[x][y2] for x in range(x1+1, x2)]  
-            print(spaces_between)
             for p in spaces_between:
                 if p != 0:
+                    print('f')
                     return False
-            piece.direction = 0
-            board[y1][y2] = piece
-            board[x1][x2] = 0
         else:
-            return False
-        if board[x1][x2] == 0:
+            print('g')
             return False
         return True              
