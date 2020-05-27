@@ -107,47 +107,51 @@ class PivitEnv(gym.Env):
         
         x1=action[0][0]
         y1=action[0][1]
-        if (x1==0 or x1==len(self.masters)-1) and (y1==0 or y1==len(self.masters)-1):
-            print("MASTER")
-            self.masters[x1][y1] = 1
+        x2=action[1][0]
+        y2=action[1][1]
+        if (x2==0 or x2==len(self.masters)-1) and (y2==0 or y2==len(self.masters)-1):
+            master=2
+            self.masters[x2][y2] = 1
+        else:
+            master=0
         if self.active_player==0:    
             #move a red piece
-            if self.red_hor[action[0][0]][action[0][1]]:
-                self.red_hor[action[0][0]][action[0][1]] = 0
-                self.red_ver[action[1][0]][action[1][1]] = 1
-            elif self.red_ver[action[0][0]][action[0][1]]:
-                self.red_hor[action[1][0]][action[1][1]] = 1
-                self.red_ver[action[0][0]][action[0][1]] = 0
+            if self.red_hor[x1][y1]:
+                self.red_hor[x1][y1] = 0
+                self.red_ver[x2][y2] = 1
+            elif self.red_ver[x1][y1]:
+                self.red_hor[x2][y2] = 1
+                self.red_ver[x1][y1] = 0
             #capture a blue piece
-            if self.blue_hor[action[1][0]][action[1][1]]:
-                self.blue_hor[action[1][0]][action[1][1]] = 0
-            elif self.blue_ver[action[1][0]][action[1][1]]:
-                self.blue_ver[action[1][0]][action[1][1]] = 0
+            if self.blue_hor[x2][y2]:
+                self.blue_hor[x2][y2] = 0
+            elif self.blue_ver[x2][y2]:
+                self.blue_ver[x2][y2] = 0
         else:
             prev_score *= -1
             #move a blue piece
-            if self.blue_hor[action[0][0]][action[0][1]]:
-                self.blue_hor[action[0][0]][action[0][1]] = 0
-                self.blue_ver[action[1][0]][action[1][1]] = 1
-            elif self.blue_ver[action[0][0]][action[0][1]]:
-                self.blue_hor[action[1][0]][action[1][1]] = 1
-                self.blue_ver[action[0][0]][action[0][1]] = 0
+            if self.blue_hor[x1][y1]:
+                self.blue_hor[x1][y1] = 0
+                self.blue_ver[x2][y2] = 1
+            elif self.blue_ver[x1][y1]:
+                self.blue_hor[x2][y2] = 1
+                self.blue_ver[x1][y1] = 0
             #capture a red piece
-            if self.red_hor[action[1][0]][action[1][1]]:
-                self.red_hor[action[1][0]][action[1][1]] = 0
-            elif self.red_ver[action[1][0]][action[1][1]]:
-                self.red_ver[action[1][0]][action[1][1]] = 0
+            if self.red_hor[x2][y2]:
+                self.red_hor[x2][y2] = 0
+            elif self.red_ver[x2][y2]:
+                self.red_ver[x2][y2] = 0
         #move a master
-        if self.masters[action[0][0]][action[0][1]]:
-            self.masters[action[0][0]][action[0][1]] = 0
-            self.masters[action[1][0]][action[1][1]] = 1
+        if self.masters[x1][y1]:
+            self.masters[x1][y1] = 0
+            self.masters[x2][y2] = 1
         #capture a master
-        if self.masters[action[1][0]][action[1][1]]:
-            self.masters[action[1][0]][action[1][1]] = 0
+        if self.masters[x2][y2]:
+            self.masters[x2][y2] = 0
         new_score = sum([sum(i) for i in self.red_ver])+sum([sum(i) for i in self.red_hor])-sum([sum(i) for i in self.blue_hor])-sum([sum(i) for i in self.blue_ver])
         if self.active_player==1:
             new_score *= -1
-        reward = new_score - prev_score
+        reward = new_score - prev_score + master
         new_state = [self.red_hor, self.red_ver, self.blue_hor, self.blue_ver, self.masters]
         
         if sum([sum(i) for i in self.red_ver])+sum([sum(i) for i in self.red_hor]) == 0 \

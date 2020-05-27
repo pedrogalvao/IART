@@ -14,6 +14,8 @@ from tensorflow.keras.layers import Reshape
 from tensorflow.keras.layers import Flatten
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.models import load_model
+
 
 def action_format(action, board_size):
     output = [[[0 for i in range(board_size)] for j in range(board_size)]]+[[[0 for i in range(board_size)] for j in range(board_size)]]
@@ -52,14 +54,17 @@ class DQNAgent:
         return model
 
     def save_model(self):
-        self.model.save(self.weight_backup)
+        self.model.save("model")
+    
+    def load_model(self):
+        self.model = load_model("model")
 
     def memorize(self, state, action, reward, next_state, done):
         state = transpose_input(state)
         next_state = transpose_input(next_state)
         self.memory.append((state, action, reward, next_state, done))
 
-    def act(self, state):
+    def act(self, state, player=None):
         #if np.random.rand() <= self.epsilon:
          #   return random.randrange(self.action_size)
         state = transpose_input(state)
