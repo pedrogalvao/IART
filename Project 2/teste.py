@@ -7,7 +7,8 @@ Created on Tue May 26 09:07:49 2020
 import gym
 import numpy as np
 from DQNAgent import DQNAgent
-from PivitEnv import PivitEnv
+from bot import Bot
+from PivitEnv import *
 
 class Test:
     def __init__(self):
@@ -18,6 +19,7 @@ class Test:
         self.state_size        = 6#self.env.observation_space.shape[0]
         self.action_size       = 6#self.env.action_space.n
         self.agent             = DQNAgent(self.state_size, self.action_size)
+        self.minimax           = Bot()
             
             
     def run(self):
@@ -29,12 +31,17 @@ class Test:
                     index = 0
                     while not done:
     #                    self.env.render()
-                         action = self.agent.act(state)
+                         #action = self.agent.act(state)
+                         action = self.minimax.act(box_to_board(state),1,index%2)
+                         print(action)
                          next_state, reward, done, _ = self.env.step(action)
-                         next_state = np.reshape(next_state, [1, self.state_size])
-                         self.agent.remember(state, action, reward, next_state, done)
+                         #next_state = np.reshape(next_state, [1, self.state_size])                         self.agent.memorize(state, action, reward, next_state, done)
                          state = next_state
                          index += 1
+                         #print(index)
+                         if index==100:
+                             print(state)
+                             break
                     print("Episode {}# Score: {}".format(index_episode, index + 1))
                     self.agent.replay(self.sample_batch_size)
             finally:

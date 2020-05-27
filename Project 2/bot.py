@@ -12,6 +12,32 @@ from time import time
 
 #from pivit import Piece
 
+def get_move(first, second):
+    orig=0
+    dest=0
+    try:
+        for i in range(len(first)):
+            for j in range(len(first[0])):
+                if first[i][j] == second[i][j]:
+                    continue
+                elif first[i][j] == 0:
+                    dest = (i,j)
+                elif second[i][j] == 0:
+                    orig=(i,j)
+                else:
+                    dest=(i,j)
+    except:
+        print("ERROR")
+        print(first)
+        print(second)
+    if orig==0:
+        print("ERROR")
+        print(first)
+        print(second)
+    return [orig,dest]
+                
+
+
 class Piece(object):
     def __init__(self, player = 0, direction=0, master=False):
         self.player = player
@@ -251,33 +277,46 @@ class Bot(object):
     
     def choose_move(self, board, depth, player=True):
         self.initial_time = time()
-        if self.terminal_node(board, player):
-            if self.winner == player:
-                return 10e+5
-            elif self.winner == 2:
-                return 0
-            else:
-                return -10e+5
+        # if self.terminal_node(board, player):
+        #     if self.winner == player:
+        #         print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA11")
+        #         return 10e+5
+        #     elif self.winner == 2:
+        #         print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA2")
+        #         return 0
+        #     else:
+        #         print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA3")
+        #         return -10e+5
         if depth == 0:
             list_of_moves = self.list_cap_moves(board, player)
             if len(list_of_moves) == 0:
-                return self.evaluate(board,player)
+                print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA4")
+                return None
         else:
             list_of_moves = self.list_moves(board, player)
             if len(list_of_moves) == 0:
-                return -10e+5
+                print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA5")
+                return None
         alpha = -10e+5
         beta = 10e+5
         for next_board in list_of_moves:
             score = -self.minimax(next_board, depth-1, not player, -beta, -alpha);
             if score >= beta:
                 self.best_move = copy.deepcopy(next_board)
-                return beta   #  fail hard beta-cutoff
+                return self.best_move   #  fail hard beta-cutoff
             if score > alpha:
                 alpha = score # alpha acts like max in MiniMax
                 self.best_move = copy.deepcopy(next_board)
         return self.best_move
     
+    def act(self, board, depth=1, player=0):
+        self.choose_move(board, depth, player)
+        new_board = self.best_move
+        action = get_move(board, new_board)
+        if action[0]==0 or action[1]==0:
+            return None
+        else:
+            return action
 
 def print_board(board):
     if board==None:
