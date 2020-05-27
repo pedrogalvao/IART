@@ -32,7 +32,6 @@ def board_to_box(board):
                     blue_ver[-1][-1] = 1
             if p.master:
                 masters[-1][-1] = 1
-    print("ss:",len(state))
     return state
                     
                 

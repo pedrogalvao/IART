@@ -16,15 +16,13 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.optimizers import Adam
 
 def action_format(action, board_size):
-    print("A",action)
     output = [[[0 for i in range(board_size)] for j in range(board_size)]]+[[[0 for i in range(board_size)] for j in range(board_size)]]
     output[0][action[0][0]][action[0][1]] = 1
     output[1][action[1][0]][action[1][1]] = 1
-    print("Out",output)
     return transpose_input(np.array(output))
     
 def transpose_input(board):
-    return np.moveaxis(board, 0, -1)
+    return np.transpose(board, (1, 2, 0))
 
 
 # Deep Q-learning Agent
@@ -66,12 +64,13 @@ class DQNAgent:
          #   return random.randrange(self.action_size)
         state = transpose_input(state)
         act_values = self.model.predict(np.array([state]))
-        print(act_values)
-        return np.argmax(act_values)  # returns action
+        act_values = np.transpose(act_values[0], (2, 0, 1))
+        orig = np.unravel_index(np.argmax(act_values[0], axis=None), act_values[0].shape)
+        dest = np.unravel_index(np.argmax(act_values[1], axis=None), act_values[1].shape)
+        return [orig, dest]  # returns action
 
     def replay(self, batch_size):
         batch_size = min(batch_size, len(self.memory))
-        print("Sizes: ",batch_size, len(self.memory))
         minibatch = random.sample(self.memory, batch_size)
         for state, action, reward, next_state, done in minibatch:
             value = reward
