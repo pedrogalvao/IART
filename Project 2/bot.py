@@ -13,6 +13,7 @@ from time import time
 #from pivit import Piece
 
 def get_move(first, second):
+    """Difference (move) between two boards"""
     orig=0
     dest=0
     try:
@@ -277,16 +278,16 @@ class Bot(object):
     
     def choose_move(self, board, depth, player=True):
         self.initial_time = time()
-        # if self.terminal_node(board, player):
-        #     if self.winner == player:
-        #         print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA11")
-        #         return 10e+5
-        #     elif self.winner == 2:
-        #         print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA2")
-        #         return 0
-        #     else:
-        #         print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA3")
-        #         return -10e+5
+        if self.terminal_node(board, player):
+            if self.winner == player:
+                print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA11")
+                return None
+            elif self.winner == 2:
+                print("EMPATE")
+                return None
+            else:
+                print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA3")
+                return None
         if depth == 0:
             list_of_moves = self.list_cap_moves(board, player)
             if len(list_of_moves) == 0:

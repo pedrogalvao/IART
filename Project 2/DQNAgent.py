@@ -29,7 +29,7 @@ class DQNAgent:
     def _build_model(self):
         # Neural Net for Deep-Q learning 
         model = Sequential()
-        model.add(Conv2D(32, kernel_size=3, activation='relu', input_shape=(self.board_size,self.board_size,5)))
+        model.add(Conv2D(32, kernel_size=3, activation='relu', input_shape=(self.board_size,self.board_size)))
         model.add(Conv2D(16, kernel_size=3, activation='relu'))
         model.add(Flatten())
         model.add(Dense(10, activation='softmax'))
@@ -49,6 +49,8 @@ class DQNAgent:
         return np.argmax(act_values[0])  # returns action
 
     def replay(self, batch_size):
+        batch_size = min(batch_size, len(self.memory))
+        print("Sizes: ",batch_size, len(self.memory))
         minibatch = random.sample(self.memory, batch_size)
         for state, action, reward, next_state, done in minibatch:
             target = reward

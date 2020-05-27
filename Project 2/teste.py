@@ -35,13 +35,16 @@ class Test:
                          action = self.minimax.act(box_to_board(state),1,index%2)
                          print(action)
                          next_state, reward, done, _ = self.env.step(action)
-                         #next_state = np.reshape(next_state, [1, self.state_size])                         self.agent.memorize(state, action, reward, next_state, done)
+                         #next_state = np.reshape(next_state, [1, self.state_size])    
+                         self.agent.memorize(state, action, reward, next_state, done)
                          state = next_state
                          index += 1
                          #print(index)
                          if index==100:
                              print(state)
                              break
+                         
+                    print(state)
                     print("Episode {}# Score: {}".format(index_episode, index + 1))
                     self.agent.replay(self.sample_batch_size)
             finally:

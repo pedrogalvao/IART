@@ -106,37 +106,45 @@ class PivitEnv(gym.Env):
         new_state = []
         prev_score = sum([sum(i) for i in self.red_ver])+sum([sum(i) for i in self.red_hor])-sum([sum(i) for i in self.blue_hor])-sum([sum(i) for i in self.blue_ver])
         
-        i=action[0][0]
-        j=action[0][1]
-        if (i==0 or i==len(self.masters)-1) and (j==0 or j==len(self.masters)-1):
+        x1=action[0][0]
+        y1=action[0][1]
+        if (x1==0 or x1==len(self.masters)-1) and (y1==0 or y1==len(self.masters)-1):
             print("MASTER")
-            self.masters[i][j] = 1
+            self.masters[x1][y1] = 1
         if self.active_player==0:    
+            #move a red piece
             if self.red_hor[action[0][0]][action[0][1]]:
                 self.red_hor[action[0][0]][action[0][1]] = 0
                 self.red_ver[action[1][0]][action[1][1]] = 1
             elif self.red_ver[action[0][0]][action[0][1]]:
                 self.red_hor[action[1][0]][action[1][1]] = 1
                 self.red_ver[action[0][0]][action[0][1]] = 0
+            #capture a blue piece
             if self.blue_hor[action[1][0]][action[1][1]]:
                 self.blue_hor[action[1][0]][action[1][1]] = 0
             elif self.blue_ver[action[1][0]][action[1][1]]:
-                self.blue_hor[action[1][0]][action[1][1]] = 0
+                self.blue_ver[action[1][0]][action[1][1]] = 0
         else:
             prev_score *= -1
+            #move a blue piece
             if self.blue_hor[action[0][0]][action[0][1]]:
                 self.blue_hor[action[0][0]][action[0][1]] = 0
                 self.blue_ver[action[1][0]][action[1][1]] = 1
             elif self.blue_ver[action[0][0]][action[0][1]]:
                 self.blue_hor[action[1][0]][action[1][1]] = 1
                 self.blue_ver[action[0][0]][action[0][1]] = 0
+            #capture a red piece
             if self.red_hor[action[1][0]][action[1][1]]:
                 self.red_hor[action[1][0]][action[1][1]] = 0
             elif self.red_ver[action[1][0]][action[1][1]]:
-                self.red_hor[action[1][0]][action[1][1]] = 0
+                self.red_ver[action[1][0]][action[1][1]] = 0
+        #move a master
         if self.masters[action[0][0]][action[0][1]]:
             self.masters[action[0][0]][action[0][1]] = 0
             self.masters[action[1][0]][action[1][1]] = 1
+        #capture a master
+        if self.masters[action[1][0]][action[1][1]]:
+            self.masters[action[1][0]][action[1][1]] = 0
         new_score = sum([sum(i) for i in self.red_ver])+sum([sum(i) for i in self.red_hor])-sum([sum(i) for i in self.blue_hor])-sum([sum(i) for i in self.blue_ver])
         if self.active_player==1:
             new_score *= -1
@@ -151,7 +159,7 @@ class PivitEnv(gym.Env):
             done = True
         
         self.active_player = not self.active_player
-        return new_state, reward, done, {}
+        return np.array(new_state), reward, done, {}
         
     
         
