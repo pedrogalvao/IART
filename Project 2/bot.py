@@ -16,17 +16,17 @@ def get_move(first, second):
     """Difference (move) between two boards"""
     orig=0
     dest=0
+    print(first)
+    print(second)
     try:
         for i in range(len(first)):
             for j in range(len(first[0])):
                 if first[i][j] == second[i][j]:
                     continue
                 elif first[i][j] == 0:
-                    dest = (i,j)
+                    dest = copy.copy((j,i))
                 elif second[i][j] == 0:
-                    orig=(i,j)
-                else:
-                    dest=(i,j)
+                    orig = copy.copy((j,i))
     except:
         print("ERROR")
         print(first)

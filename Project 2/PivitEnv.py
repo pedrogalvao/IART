@@ -187,50 +187,50 @@ class PivitEnv(gym.Env):
         pass
 
     def validMove(self, action):
-           
-           board = box_to_board([self.red_hor, self.red_ver, self.blue_hor, self.blue_ver, self.masters])
-          
-           piece = board[action[0][0]][action[0][1]]
-           if piece == 0:
-               return False
-           elif piece.player != self.active_player:
-               return False
-           elif board[action[1][0]][action[1][1]] != 0:
-              if piece.player == board[action[1][0]][action[1][1]].player:
-                   return False
-           if action[1][0]==action[0][0] and piece.direction == 0:
-               if piece.master == False:
-                   if ((action[1][0] + action[1][1]) - sum(action[0][0], action[0][1]))%2 == 0:
-                       return False
-               if action[1][1] < action[0][1]:
-                   spaces_between = [board[action[1][0]][y] for y in range(action[1][1]+1, action[0][1])]
-               else:
-                   spaces_between = [board[action[1][0]][y] for y in range(action[0][1]+1, action[1][1])]
-               for p in spaces_between:
-                   if p != 0:
-                       return False
-               piece.direction = 1
-               board[action[1][0]][action[1][1]] = piece
-               board[action[0][0]][action[0][1]] = 0
-           elif action[1][1]==action[0][1] and piece.direction == 1:
-               if piece.master == False:
-                   if (action[0][1] + action[1][1] - sum(action[0][0], action[0][1]))%2 == 0:
-                       return False
-               if action[1][0] < action[0][0]:
-                   spaces_between = [board[x][action[1][1]] for x in range(action[1][0]+1, action[0][0])]
-               else:
-                   spaces_between = [board[x][action[1][1]] for x in range(action[0][0]+1, action[1][0])]  
-               print(spaces_between)
-               for p in spaces_between:
-                   if p != 0:
-                       return False
-               piece.direction = 0
-               board[action[1][0]][action[1][1]] = piece
-               board[action[0][0]][action[0][1]] = 0
-           else:
-               return False
-           if board[action[1][0]][action[1][1]] == 0:
-               return False
-           elif (action[1][0]==0 or action[1][0]==self.board_size-1) and (action[1][1]==0 or action[1][1]==self.board_size-1):
-               board[action[1][0]][action[1][1]].master = True
-           return True              
+        
+        board = box_to_board([self.red_hor, self.red_ver, self.blue_hor, self.blue_ver, self.masters])
+       
+        x1=action[0][0]
+        y1=action[0][1]
+        x2=action[1][0]
+        y2=action[1][1]
+        piece = board[x1][y1]
+        print(piece)
+        if piece == 0:
+            return False
+        elif piece.player != self.active_player:
+            return False
+        elif board[x2][y2] != 0:
+           if piece.player == board[x2][y2].player:
+                return False
+        if piece.master == False:
+            if (x1+x2+y1+y2)%2 == 0:
+                return False
+        if y1==y2 and piece.direction == 0:
+            if action[1][1] < action[0][1]:
+                spaces_between = [board[action[1][0]][y] for y in range(action[1][1]+1, action[0][1])]
+            else:
+                spaces_between = [board[action[1][0]][y] for y in range(action[0][1]+1, action[1][1])]
+            for p in spaces_between:
+                if p != 0:
+                    return False
+            piece.direction = 1
+            board[action[1][0]][action[1][1]] = piece
+            board[action[0][0]][action[0][1]] = 0
+        elif action[1][1]==action[0][1] and piece.direction == 1:
+            if x2 < x1:
+                spaces_between = [board[x][y2] for x in range(x2+1, x1)]
+            else:
+                spaces_between = [board[x][y2] for x in range(x1+1, x2)]  
+            print(spaces_between)
+            for p in spaces_between:
+                if p != 0:
+                    return False
+            piece.direction = 0
+            board[y1][y2] = piece
+            board[x1][x2] = 0
+        else:
+            return False
+        if board[x1][x2] == 0:
+            return False
+        return True              
