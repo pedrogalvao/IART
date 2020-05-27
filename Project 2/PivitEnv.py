@@ -98,6 +98,7 @@ class PivitEnv(gym.Env):
 
     def step(self, action):
         # Execute one time step within the environment
+        
         if self.active_player==0:    
             #prev_score = sum(self.red_ver)+sum(self.red_hor)-sum(self.blue_hor)-sum(self.blue_ver)
             if self.red_hor[action[0][0]][action[0][1]] == 1:
