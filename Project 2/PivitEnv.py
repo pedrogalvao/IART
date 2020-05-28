@@ -98,7 +98,7 @@ class PivitEnv(gym.Env):
 
     def step(self, action):
         if action == None:
-            return self.state, -20, True, {}
+            return self.state, -1, True, {}
         # Execute one time step within the environment
         done  = False
         reward = []
@@ -108,7 +108,7 @@ class PivitEnv(gym.Env):
         if self.validMove(action) == False:
             #print("Invalid Move")
             self.active_player = not self.active_player
-            return self.state, -20, False, {}
+            return self.state, -1, False, {}
     
         prev_score = sum([sum(i) for i in self.red_ver])+sum([sum(i) for i in self.red_hor])-sum([sum(i) for i in self.blue_hor])-sum([sum(i) for i in self.blue_ver])
         
@@ -203,7 +203,7 @@ class PivitEnv(gym.Env):
             print('b')
             return False
         elif board[x2][y2] != 0:
-           if piece.player == board[x2][y2].player:
+            if piece.player == board[x2][y2].player:
                 print('c')
                 return False
         if piece.master == False:
@@ -223,7 +223,7 @@ class PivitEnv(gym.Env):
             if x2 < x1:
                 spaces_between = [board[x][y2] for x in range(x2+1, x1)]
             else:
-                spaces_between = [board[x][y2] for x in range(x1+1, x2)]  
+                spaces_between = [board[x][y2] for x in range(x1+1, x2)]
             for p in spaces_between:
                 if p != 0:
                     print('f')

@@ -6,14 +6,14 @@ Created on Tue May 26 09:07:49 2020
 """
 import gym
 import numpy as np
-from DQNAgent import DQNAgent
+from DQNAgent import *
 from bot import Bot
 from PivitEnv import *
 
 class Test:
     def __init__(self):
         self.sample_batch_size = 32
-        self.episodes          = 1
+        self.episodes          = 10
         self.env               = PivitEnv(6)
 
         self.state_size        = 6#self.env.observation_space.shape[0]
@@ -37,6 +37,7 @@ class Test:
                  if action == None:
                      break
                  next_state, reward, done, _ = self.env.step(action)
+                 self.dqnagent.memorize(state, action, reward+1, next_state, done)
                  minmax_points += reward
                  state = next_state
                  action = self.dqnagent.act(state,1)
@@ -45,12 +46,15 @@ class Test:
                  next_state, reward, done, _ = self.env.step(action)
                  if reward>=0:
                      print("DQNAgent made a valid move")
+                     reward=1
+                 self.dqnagent.memorize(change_colors(state), action, reward, change_colors(next_state), done)
                  dqn_points += reward
                  state = next_state
                  
                  index += 1
                  if index==100:
                     break
+        self.dqnagent.replay(self.sample_batch_size)
         return minmax_points, dqn_points
                 
             
@@ -79,27 +83,6 @@ class Test:
                              break
                     print("Episode", index_episode, "Number of moves:", index + 1)
                     self.dqnagent.replay(self.sample_batch_size)
-                    
-    #             for index_episode in range(self.episodes):
-    #                 state = self.env.reset()
-    #                 #state = np.reshape(state, [1, self.state_size])
-    #                 done = False
-    #                 index = 0
-    #                 while not done:
-    # #                    self.env.render()
-    #                      #action = self.agent.act(state)
-    #                      action = self.dqnagent.act(state)
-    #                      next_state, reward, done, _ = self.env.step(action)
-    #                      #next_state = np.reshape(next_state, [1, self.state_size])    
-    #                      self.dqnagent.memorize(state, action, reward, next_state, done)
-    #                      state = next_state
-    #                      index += 1
-    #                      #print(index)
-    #                      if index==100:
-    #                          break
-    #                 print(state)
-    #                 print("Episode", index_episode, "Number of moves:", index + 1)
-    #                 self.dqnagent.replay(self.sample_batch_size)
             finally:
                 self.dqnagent.save_model()
                 
