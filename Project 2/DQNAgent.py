@@ -68,27 +68,20 @@ class DQNAgent:
         reshape_7a = Reshape((self.board_size, self.board_size))(dense_6a)
         print("reshape a:", reshape_7a.shape)
         reshape_7b = Reshape((self.board_size, self.board_size,1))(dense_6b)
-        print("reshape b:",reshape_7b.shape)
         # flatten_red = Flatten()(red)
         # print("flatten red b:",flatten_red.shape)
         #reshape_red = Reshape((self.board_size, self.board_size,1))(flatten_red)
         #print("reshape red:", reshape_red.shape)
         min_a = Minimum()([reshape_7a, red])
-        print("min:",min_a.shape)
         
         flatten_2a = Flatten()(min_a)
-        print("flatten a:", flatten_2a.shape)
         softmax_a = Softmax(axis=1)(flatten_2a)
-        print("softmax_a:", softmax_a.shape)
         
         flatten_2b = Flatten()(reshape_7b)
-        print("flatten b:", flatten_2b.shape)
         softmax_b = Softmax(axis=1)(flatten_2b)
-        print("softmax_b:", softmax_a.shape)
         
         reshape_a = Reshape((self.board_size, self.board_size,1))(softmax_a)
         reshape_b = Reshape((self.board_size, self.board_size,1))(softmax_b)
-        print("reshape a:",reshape_a.shape)
         concat = Concatenate(axis=-1)([reshape_a, reshape_b])
         model = Model(inputs=input_, outputs=concat)
         model.compile(loss='mse', optimizer=Adam(lr=self.learning_rate))
@@ -101,7 +94,6 @@ class DQNAgent:
         self.model = load_model("model")
 
     def memorize(self, state, action, reward, next_state, done):
-        print('mem')
         state = transpose_input(state)
         next_state = transpose_input(next_state)
         self.memory.append((state, action, reward, next_state, done))
@@ -122,6 +114,7 @@ class DQNAgent:
     def replay(self, batch_size):
         batch_size = min(batch_size, len(self.memory))
         minibatch = random.sample(self.memory, batch_size)
+        print('training...')
         for state, action, reward, next_state, done in minibatch:
             value = reward
             state = np.array([state])
@@ -133,6 +126,5 @@ class DQNAgent:
             #target_f[0][action[0][0]][action[0][1]] *= (target +1)
             target = action_format(action, self.board_size)*(value+1)
             self.model.fit(state, np.array([target]), epochs=1, verbose=0)
-            print('.')
         if self.epsilon > self.epsilon_min:
             self.epsilon *= self.epsilon_decay
