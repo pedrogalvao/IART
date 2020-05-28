@@ -47,6 +47,7 @@ class DQNAgent:
     def _build_model(self):
         # Neural Net for Deep-Q learning 
         input_ = Input(shape=(self.board_size,self.board_size,5))
+        print("input:",input_.shape)
         red = Maximum()([input_[:,:,:,0],input_[:,:,:,1]])
         print("red:",red.shape)
         #blue = Maximum()([input_[:,:,2],input_[:,:,3]])
@@ -56,12 +57,12 @@ class DQNAgent:
         deconv_4 = Conv2DTranspose(3, kernel_size=3, activation='relu')(deconv_3)
         flatten_5 = Flatten()(deconv_4)
         print("flatten:", flatten_5.shape)
-        dense_6a = Dense(self.board_size**2, activation='relu')(flatten_5[0:self.board_size**2])
-        dense_6b = Dense(self.board_size**2, activation='relu')(flatten_5[self.board_size**2:])
+        dense_6a = Dense(self.board_size**2, activation='relu')(flatten_5[:,0:self.board_size**2])
+        dense_6b = Dense(self.board_size**2, activation='relu')(flatten_5[:,self.board_size**2:])
         print("dense:", dense_6b.shape)
         reshape_7a = Reshape((self.board_size, self.board_size))(dense_6a)
         print("reshape a:", reshape_7a.shape)
-        reshape_7b = Reshape((self.board_size, self.board_size))(dense_6b)
+        reshape_7b = Reshape((self.board_size, self.board_size,1))(dense_6b)
         print("reshape b:",reshape_7b.shape)
         # flatten_red = Flatten()(red)
         # print("flatten red b:",flatten_red.shape)
@@ -69,7 +70,8 @@ class DQNAgent:
         #print("reshape red:", reshape_red.shape)
         min_a = Minimum()([reshape_7a, red])
         print("min:",min_a.shape)
-        concat = Concatenate(axis=-1)([min_a, reshape_7b])
+        reshape_min = Reshape((self.board_size, self.board_size,1))(min_a)
+        concat = Concatenate(axis=-1)([reshape_min, reshape_7b])
         model = Model(inputs=input_, outputs=concat)
         model.compile(loss='mse', optimizer=Adam(lr=self.learning_rate))
         return model
@@ -89,6 +91,8 @@ class DQNAgent:
         #if np.random.rand() <= self.epsilon:
          #   return random.randrange(self.action_size)
         state = transpose_input(state)
+        if player == 1:
+            state = np.flip(state, axis=2)
         act_values = self.model.predict(np.array([state]))
         act_values = np.transpose(act_values[0], (2, 0, 1))
         orig = np.unravel_index(np.argmax(act_values[0], axis=None), act_values[0].shape)

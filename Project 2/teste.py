@@ -39,7 +39,7 @@ class Test:
                  next_state, reward, done, _ = self.env.step(action)
                  minmax_points += reward
                  state = next_state
-                 action = self.dqnagent.act(state)
+                 action = self.dqnagent.act(state,1)
                  if action == None:
                      break
                  next_state, reward, done, _ = self.env.step(action)
