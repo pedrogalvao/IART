@@ -55,6 +55,7 @@ class Piece(object):
         return " P"+str(self.player)+d+m
 
 class Bot(object):
+    """Minimax"""
     def __init__(self):
         self.best_move = None
         self.initial_time = time()
