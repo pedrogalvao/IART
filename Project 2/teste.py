@@ -22,9 +22,8 @@ class Test:
         self.minimax           = Bot()
            
     def testDQN(self):
-        """Testar DQN jogando contra MinMax"""
+        """Testar DQN jogando contra si"""
         dqn_points=0
-        minmax_points=0
         for index_episode in range(self.episodes):
             state = self.env.reset()
             #state = np.reshape(state, [1, self.state_size])
@@ -41,12 +40,11 @@ class Test:
                  self.dqnagent.memorize(change_colors(state), action, reward, change_colors(next_state), done)
                  dqn_points += reward
                  state = next_state
-                 
                  index += 1
                  if index==100:
                     break
         self.dqnagent.replay(self.sample_batch_size)
-        return minmax_points, dqn_points
+        return dqn_points
            
     def testMinimaxDQN(self):
         """Testar DQN jogando contra MinMax"""
@@ -87,21 +85,17 @@ class Test:
             try:
                 for index_episode in range(self.episodes):
                     state = self.env.reset()
-                    #state = np.reshape(state, [1, self.state_size])
                     done = False
                     index = 0
                     while not done:
-    #                    self.env.render()
                          action = self.minimax.act(box_to_board(state),1,index%2)
                          if action == None:
                              break
                          next_state, reward, done, _ = self.env.step(action)
                          
-                         #next_state = np.reshape(next_state, [1, self.state_size])
                          self.dqnagent.memorize(state, action, reward, next_state, done)
                          state = next_state
                          index += 1
-                         #print(index)
                          if index==100:
                              break
                     print("Episode", index_episode, "Number of moves:", index + 1)

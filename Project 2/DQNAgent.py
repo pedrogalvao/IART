@@ -68,10 +68,6 @@ class DQNAgent:
         reshape_7a = Reshape((self.board_size, self.board_size))(dense_6a)
         print("reshape a:", reshape_7a.shape)
         reshape_7b = Reshape((self.board_size, self.board_size,1))(dense_6b)
-        # flatten_red = Flatten()(red)
-        # print("flatten red b:",flatten_red.shape)
-        #reshape_red = Reshape((self.board_size, self.board_size,1))(flatten_red)
-        #print("reshape red:", reshape_red.shape)
         min_a = Minimum()([reshape_7a, red])
         
         flatten_2a = Flatten()(min_a)
