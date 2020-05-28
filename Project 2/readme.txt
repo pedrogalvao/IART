@@ -4,6 +4,7 @@ Em seguida invoca-se uma das seguintes funções para testar e treinar o agente 
 test.testDQN()
 test.testMinimaxDQN()
 test.testMinimax()
+Ao executar o ficheiro teste.py a função testMinimaxDQN() é executada automaticamente.
 
 
 Para mudar o número de episodios em cada teste:
