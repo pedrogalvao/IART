@@ -7,12 +7,17 @@ Created on Fri May 15 12:19:35 2020
 from collections import deque
 import numpy as np
 import random
+from tensorflow.keras.layers import Input
 from tensorflow.keras.layers import Conv2D
 from tensorflow.keras.layers import Conv2DTranspose
+from tensorflow.keras.layers import Maximum
+from tensorflow.keras.layers import Minimum
 from tensorflow.keras.layers import Dense
 from tensorflow.keras.layers import Reshape
+from tensorflow.keras.layers import Concatenate
 from tensorflow.keras.layers import Flatten
 from tensorflow.keras.models import Sequential
+from tensorflow.keras.models import Model
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.models import load_model
 
@@ -29,9 +34,8 @@ def transpose_input(board):
 
 # Deep Q-learning Agent
 class DQNAgent:
-    def __init__(self, board_size, action_size):
+    def __init__(self, board_size):
         self.board_size = board_size
-        self.action_size = action_size
         self.memory = deque(maxlen=2000)
         self.gamma = 0.95    # discount rate
         self.epsilon = 1.0  # exploration rate
@@ -42,14 +46,31 @@ class DQNAgent:
 
     def _build_model(self):
         # Neural Net for Deep-Q learning 
-        model = Sequential()
-        model.add(Conv2D(32, kernel_size=3, activation='relu', input_shape=(self.board_size,self.board_size,5)))
-        model.add(Conv2D(16, kernel_size=3, activation='relu'))
-        model.add(Conv2DTranspose(16, kernel_size=3, activation='relu'))
-        model.add(Conv2DTranspose(16, kernel_size=3, activation='relu'))
-        model.add(Flatten())
-        model.add(Dense(2*self.board_size**2, activation='softmax'))
-        model.add(Reshape((self.board_size, self.board_size, 2)))
+        input_ = Input(shape=(self.board_size,self.board_size,5))
+        red = Maximum()([input_[:,:,:,0],input_[:,:,:,1]])
+        print("red:",red.shape)
+        #blue = Maximum()([input_[:,:,2],input_[:,:,3]])
+        conv_1 = Conv2D(3, kernel_size=3, activation='relu')(input_)
+        conv_2 = Conv2D(3, kernel_size=3, activation='relu')(conv_1)
+        deconv_3 = Conv2DTranspose(3, kernel_size=3, activation='relu')(conv_2)
+        deconv_4 = Conv2DTranspose(3, kernel_size=3, activation='relu')(deconv_3)
+        flatten_5 = Flatten()(deconv_4)
+        print("flatten:", flatten_5.shape)
+        dense_6a = Dense(self.board_size**2, activation='relu')(flatten_5[0:self.board_size**2])
+        dense_6b = Dense(self.board_size**2, activation='relu')(flatten_5[self.board_size**2:])
+        print("dense:", dense_6b.shape)
+        reshape_7a = Reshape((self.board_size, self.board_size))(dense_6a)
+        print("reshape a:", reshape_7a.shape)
+        reshape_7b = Reshape((self.board_size, self.board_size))(dense_6b)
+        print("reshape b:",reshape_7b.shape)
+        # flatten_red = Flatten()(red)
+        # print("flatten red b:",flatten_red.shape)
+        #reshape_red = Reshape((self.board_size, self.board_size,1))(flatten_red)
+        #print("reshape red:", reshape_red.shape)
+        min_a = Minimum()([reshape_7a, red])
+        print("min:",min_a.shape)
+        concat = Concatenate(axis=-1)([min_a, reshape_7b])
+        model = Model(inputs=input_, outputs=concat)
         model.compile(loss='mse', optimizer=Adam(lr=self.learning_rate))
         return model
 
@@ -87,8 +108,6 @@ class DQNAgent:
             #print("target_f:",target_f)
             #target_f[0][action[0][0]][action[0][1]] *= (target +1)
             target = action_format(action, self.board_size)*(value+1)
-            print("input:", state)
-            print("target:", target)
             self.model.fit(state, np.array([target]), epochs=1, verbose=0)
         if self.epsilon > self.epsilon_min:
             self.epsilon *= self.epsilon_decay

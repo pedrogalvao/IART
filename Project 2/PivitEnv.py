@@ -98,14 +98,16 @@ class PivitEnv(gym.Env):
 
     def step(self, action):
         if action == None:
-            return self.state, -10, True, {}
+            return self.state, -20, True, {}
         # Execute one time step within the environment
         done  = False
         reward = []
         new_state = []
+        
 
         if self.validMove(action) == False:
-            print("Invalid Move")
+            #print("Invalid Move")
+            self.active_player = not self.active_player
             return self.state, -20, False, {}
     
         prev_score = sum([sum(i) for i in self.red_ver])+sum([sum(i) for i in self.red_hor])-sum([sum(i) for i in self.blue_hor])-sum([sum(i) for i in self.blue_ver])
@@ -165,7 +167,6 @@ class PivitEnv(gym.Env):
                     + sum([sum(i) for i in self.blue_hor])+sum([sum(i) for i in self.blue_ver]) == sum([sum(i) for i in self.masters]):
             print("DONE__________________________________________")
             done = True
-        
         self.active_player = not self.active_player
         return np.array(new_state), reward, done, {}
         

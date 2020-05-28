@@ -278,23 +278,19 @@ class Bot(object):
         self.initial_time = time()
         if self.terminal_node(board, player):
             if self.winner == player:
-                print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA11")
                 return None
             elif self.winner == 2:
                 print("EMPATE")
                 return None
             else:
-                print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA3")
                 return None
         if depth == 0:
             list_of_moves = self.list_cap_moves(board, player)
             if len(list_of_moves) == 0:
-                print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA4")
                 return None
         else:
             list_of_moves = self.list_moves(board, player)
             if len(list_of_moves) == 0:
-                print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA5")
                 return None
         alpha = -10e+5
         beta = 10e+5
