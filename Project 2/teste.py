@@ -33,7 +33,7 @@ class Test:
             while not done:
 #                    self.env.render()
                  #action = self.agent.act(state)
-                 action = self.minimax.act(box_to_board(state),1,0)
+                 action = self.minimax.act(box_to_board(state), 1, 0)
                  if action == None:
                      break
                  next_state, reward, done, _ = self.env.step(action)
